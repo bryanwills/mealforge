@@ -1,9 +1,18 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, BookOpen, Calendar, ShoppingCart, ChefHat } from "lucide-react";
+import { UserMenu } from "@/components/user-menu";
 
-export default function Home() {
+export default async function Home() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -24,6 +33,7 @@ export default function Home() {
               <Link href="/grocery-lists">
                 <Button variant="ghost">Grocery Lists</Button>
               </Link>
+              <UserMenu />
             </nav>
           </div>
         </div>
