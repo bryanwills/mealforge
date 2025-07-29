@@ -4,13 +4,16 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Search, Filter, Globe, Loader2 } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Plus, Search, Filter, Globe, Loader2, Upload } from "lucide-react"
+import { Navigation } from "@/components/navigation"
 import { RecipeCard, type Recipe } from "@/components/recipe-card"
+import { RecipeModal } from "@/components/recipe-modal"
 
 export default function RecipesPage() {
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const fetchSavedRecipes = async () => {
@@ -70,49 +73,13 @@ export default function RecipesPage() {
   }
 
   const handleViewRecipe = (recipe: Recipe) => {
-    // Navigate to recipe detail page
-    window.location.href = `/recipes/${recipe.id}`
+    setSelectedRecipe(recipe)
+    setIsModalOpen(true)
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b border-orange-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-800">
-                  ← Back to Dashboard
-                </Button>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
-                <Filter className="mr-2 h-4 w-4" />
-                Filter
-              </Button>
-              <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
-                <Search className="mr-2 h-4 w-4" />
-                Search
-              </Button>
-              <Link href="/explore">
-                <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
-                  <Globe className="mr-2 h-4 w-4" />
-                  Explore
-                </Button>
-              </Link>
-              <Link href="/recipes/new">
-                <Button className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Recipe
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -121,6 +88,36 @@ export default function RecipesPage() {
           <p className="text-gray-600 dark:text-gray-300">
             Your saved recipe collection
           </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
+            <Filter className="mr-2 h-4 w-4" />
+            Filter
+          </Button>
+          <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
+            <Search className="mr-2 h-4 w-4" />
+            Search
+          </Button>
+          <Link href="/explore">
+            <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
+              <Globe className="mr-2 h-4 w-4" />
+              Explore
+            </Button>
+          </Link>
+          <Link href="/recipes/import">
+            <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </Button>
+          </Link>
+          <Link href="/recipes/new">
+            <Button className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              New Recipe
+            </Button>
+          </Link>
         </div>
 
         {/* Recipe Grid */}
@@ -177,6 +174,18 @@ export default function RecipesPage() {
           </div>
         )}
       </main>
+
+      {/* Recipe Modal */}
+      {selectedRecipe && (
+        <RecipeModal
+          recipe={selectedRecipe}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedRecipe(null)
+          }}
+        />
+      )}
     </div>
   )
 }

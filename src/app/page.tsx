@@ -4,8 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, BookOpen, Calendar, ShoppingCart, ChefHat, Search } from "lucide-react";
-import { UserMenu } from "@/components/user-menu";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Navigation } from "@/components/navigation";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -16,33 +15,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b border-orange-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <ChefHat className="h-8 w-8 text-orange-500 dark:text-orange-400" />
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">MealForge</h1>
-            </div>
-            <nav className="flex items-center space-x-4">
-              <Link href="/recipes">
-                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-800">Recipes</Button>
-              </Link>
-              <Link href="/explore">
-                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-800">Explore</Button>
-              </Link>
-              <Link href="/meal-plans">
-                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-800">Meal Plans</Button>
-              </Link>
-              <Link href="/grocery-lists">
-                <Button variant="ghost" className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-800">Grocery Lists</Button>
-              </Link>
-              <ThemeToggle />
-              <UserMenu />
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

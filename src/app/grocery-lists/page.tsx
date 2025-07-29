@@ -1,36 +1,15 @@
-import Link from "next/link";
+"use client";
+
+import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, ShoppingCart, ArrowLeft } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Plus, ShoppingCart, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function GroceryListsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b border-orange-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-800">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <Link href="/grocery-lists/new">
-                <Button className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Grocery List
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -39,6 +18,16 @@ export default function GroceryListsPage() {
           <p className="text-gray-600 dark:text-gray-300">
             Manage your shopping lists
           </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-4 mb-8">
+          <Link href="/grocery-lists/new">
+            <Button className="bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              New Grocery List
+            </Button>
+          </Link>
         </div>
 
         {/* Empty State */}

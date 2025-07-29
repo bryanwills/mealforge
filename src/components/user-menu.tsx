@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -15,6 +15,15 @@ import { ChevronDown, User, Settings, LogOut } from "lucide-react";
 
 export function UserMenu() {
   const { user, isSignedIn } = useUser();
+  const { signOut } = useClerk();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   if (!isSignedIn) {
     return (
@@ -57,7 +66,10 @@ export function UserMenu() {
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-orange-200 dark:bg-gray-700" />
-        <DropdownMenuItem className="text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-800 hover:text-orange-700 dark:hover:text-orange-400">
+        <DropdownMenuItem
+          className="text-gray-700 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-gray-800 hover:text-orange-700 dark:hover:text-orange-400 cursor-pointer"
+          onClick={handleSignOut}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sign out</span>
         </DropdownMenuItem>
