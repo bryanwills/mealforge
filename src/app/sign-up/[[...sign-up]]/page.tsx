@@ -1,3 +1,5 @@
+"use client";
+
 import { SignUp } from "@clerk/nextjs";
 
 export default function SignUpPage() {
@@ -18,7 +20,10 @@ export default function SignUpPage() {
               headerTitle: "text-2xl font-bold text-gray-800 dark:text-white",
               headerSubtitle: "text-gray-600 dark:text-gray-300",
               header: "text-center",
-              socialButtonsBlockButton: "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 h-12 text-base font-medium",
+              // Make ALL social buttons taller and better centered
+              socialButtonsBlockButton: 'min-h-[64px] px-6 flex items-center justify-center',
+              // Target ALL social icons for size increase and centering
+              socialButtonsIconButton: 'w-16 h-16 flex items-center justify-center',
               socialButtonsBlockButtonArrow: "text-gray-700 dark:text-gray-200",
               formButtonPrimary: "bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white font-medium h-12 text-base transition-colors duration-200",
               formFieldLabel: "text-gray-700 dark:text-gray-200 font-medium text-base",
@@ -35,6 +40,11 @@ export default function SignUpPage() {
               footerAction: "text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300",
               identityPreviewText: "text-gray-700 dark:text-gray-200",
               identityPreviewEditButton: "text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300",
+              // Target GitHub specifically for custom styling
+              // NOTE: [data-provider="github"] may not always work due to Shadow DOM
+              // So we use container overrides here
+              socialButtonsBlockButton__github: 'bg-white dark:bg-white border border-gray-600 min-h-[64px] px-6 flex items-center justify-center',
+              socialButtonsIconButton__github: 'w-16 h-16 flex items-center justify-center filter brightness-[10000%]', // white-wash the black icon
             },
             variables: {
               colorPrimary: "#f97316",

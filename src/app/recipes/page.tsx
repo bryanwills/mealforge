@@ -1,80 +1,66 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Search, Filter, Globe, Loader2, Upload } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Navigation } from "@/components/navigation"
-import { RecipeCard, type Recipe } from "@/components/recipe-card"
+import { Plus, Search, Filter, Globe, Upload } from "lucide-react"
 import { RecipeModal } from "@/components/recipe-modal"
+import { RecipeCard, type Recipe } from "@/components/recipe-card"
 
 export default function RecipesPage() {
-  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
 
-  useEffect(() => {
-    const fetchSavedRecipes = async () => {
-      try {
-        const response = await fetch('/api/recipes/saved')
-        if (response.ok) {
-          const data = await response.json()
-          // For now, we'll use mock data for the saved recipes
-          // In a real app, you'd fetch the full recipe details from your database
-          const mockSavedRecipes: Recipe[] = [
-            {
-              id: 'external-1',
-              title: 'Spaghetti Carbonara',
-              description: 'Classic Italian pasta dish with eggs, cheese, and pancetta',
-              image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop',
-              cookingTime: 20,
-              servings: 4,
-              difficulty: 'Medium',
-              tags: ['Italian', 'Pasta', 'Quick'],
-              source: 'external',
-              externalId: '1',
-              externalSource: 'Spoonacular',
-              rating: 4.5,
-              isSaved: true
-            },
-            {
-              id: 'external-2',
-              title: 'Chicken Tikka Masala',
-              description: 'Creamy and flavorful Indian curry with tender chicken',
-              image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop',
-              cookingTime: 45,
-              servings: 6,
-              difficulty: 'Medium',
-              tags: ['Indian', 'Curry', 'Spicy'],
-              source: 'external',
-              externalId: '2',
-              externalSource: 'Spoonacular',
-              rating: 4.8,
-              isSaved: true
-            }
-          ]
-          setSavedRecipes(mockSavedRecipes)
-        }
-      } catch (error) {
-        console.error('Failed to fetch saved recipes:', error)
-      } finally {
-        setLoading(false)
-      }
+  // Mock data for demonstration
+  const savedRecipes: Recipe[] = [
+    {
+      id: "1",
+      title: "Spaghetti Carbonara",
+      description: "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      image: "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=400&h=300&fit=crop",
+      cookingTime: 25,
+      servings: 4,
+      difficulty: "Medium",
+      tags: ["Italian", "Pasta", "Quick"],
+      rating: 4.5,
+      source: "personal" as const
+    },
+    {
+      id: "2",
+      title: "Chicken Tikka Masala",
+      description: "Creamy and flavorful Indian curry with tender chicken",
+      image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      cookingTime: 45,
+      servings: 6,
+      difficulty: "Medium",
+      tags: ["Indian", "Curry", "Chicken"],
+      rating: 4.8,
+      source: "personal" as const
+    },
+    {
+      id: "3",
+      title: "Chocolate Chip Cookies",
+      description: "Soft and chewy cookies with chocolate chips",
+      image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=400&h=300&fit=crop",
+      cookingTime: 30,
+      servings: 24,
+      difficulty: "Easy",
+      tags: ["Dessert", "Baking", "Chocolate"],
+      rating: 4.9,
+      source: "personal" as const
     }
-
-    fetchSavedRecipes()
-  }, [])
-
-  const handleSaveRecipe = (recipe: Recipe) => {
-    // Remove from saved recipes when unsaved
-    setSavedRecipes(prev => prev.filter(r => r.id !== recipe.id))
-  }
+  ]
 
   const handleViewRecipe = (recipe: Recipe) => {
     setSelectedRecipe(recipe)
     setIsModalOpen(true)
+  }
+
+  const handleSaveRecipe = (recipe: Recipe) => {
+    // TODO: Implement save functionality
+    console.log("Saving recipe:", recipe.title)
   }
 
   return (
@@ -121,14 +107,8 @@ export default function RecipesPage() {
         </div>
 
         {/* Recipe Grid */}
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Loading your recipes...</span>
-            </div>
-          </div>
-        ) : savedRecipes.length === 0 ? (
+        {/* loading state removed */}
+        {savedRecipes.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Empty State */}
             <Card className="col-span-full text-center py-12 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700">

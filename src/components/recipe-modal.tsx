@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Users, Star, ExternalLink, X, Save, Share2 } from "lucide-react";
-import { type Recipe } from "@/components/recipe-card";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Clock, Users, Star, Heart, Share2, X, ExternalLink } from "lucide-react"
+import { Recipe } from "@/components/recipe-card"
 
 interface RecipeModalProps {
   recipe: Recipe;
@@ -79,7 +78,7 @@ export function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProps) {
                   : "text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800"
                 }
               >
-                <Save className="mr-2 h-4 w-4" />
+                <Heart className="mr-2 h-4 w-4" />
                 {isSaved ? "Saved" : "Save"}
               </Button>
             </div>

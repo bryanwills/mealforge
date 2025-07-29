@@ -1,12 +1,26 @@
 import { NextRequest, NextResponse } from "next/server"
 import { recipeAPIService, mockExternalRecipes } from "@/lib/recipe-api"
 
+export const dynamic = 'force-dynamic'
+
+interface ExternalIngredient {
+  name: string
+  amount: number
+  unit: string
+  original: string
+}
+
+interface ExternalStep {
+  number: number
+  step: string
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const recipeId = params.id
+    const { id: recipeId } = await params
 
     // Check if it's an external recipe
     if (recipeId.startsWith('external-')) {
@@ -25,14 +39,14 @@ export async function GET(
           // Add ingredients and instructions from the external API
           const detailedRecipe = {
             ...convertedRecipe,
-            ingredients: externalRecipe.extendedIngredients?.map((ingredient: any, index: number) => ({
+            ingredients: externalRecipe.extendedIngredients?.map((ingredient: ExternalIngredient, index: number) => ({
               id: index + 1,
               name: ingredient.name,
               amount: ingredient.amount,
               unit: ingredient.unit,
               original: ingredient.original
             })) || [],
-            instructions: externalRecipe.analyzedInstructions?.[0]?.steps?.map((step: any) => ({
+            instructions: externalRecipe.analyzedInstructions?.[0]?.steps?.map((step: ExternalStep) => ({
               number: step.number,
               step: step.step
             })) || []

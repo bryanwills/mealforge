@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, Filter, Grid, List, Loader2, ChefHat } from "lucide-react"
+import { Search, Filter, Grid, Loader2, ChefHat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -9,6 +9,13 @@ import { UserMenu } from "@/components/user-menu"
 import { RecipeCard, type Recipe } from "@/components/recipe-card"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+
+interface SearchParams {
+  query?: string;
+  offset?: string;
+  maxReadyTime?: string;
+  diet?: string;
+}
 
 export default function ExplorePage() {
   const [recipes, setRecipes] = useState<Recipe[]>([])
@@ -19,7 +26,7 @@ export default function ExplorePage() {
   const [hasMore, setHasMore] = useState(true)
   const router = useRouter()
 
-  const fetchRecipes = useCallback(async (searchParams: any = {}) => {
+  const fetchRecipes = useCallback(async (searchParams: SearchParams = {}) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -61,7 +68,7 @@ export default function ExplorePage() {
     setActiveFilter(filter)
     setOffset(0)
 
-    const searchParams: any = { offset: "0" }
+    const searchParams: SearchParams = { offset: "0" }
 
     switch (filter) {
       case "personal":

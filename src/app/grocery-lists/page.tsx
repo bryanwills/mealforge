@@ -1,9 +1,9 @@
 "use client";
 
-import { Navigation } from "@/components/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, ShoppingCart, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Navigation } from "@/components/navigation"
+import { Plus, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
 export default function GroceryListsPage() {

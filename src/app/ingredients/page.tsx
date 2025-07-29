@@ -1,8 +1,8 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, ChefHat, ArrowLeft } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Plus, ChefHat, ArrowLeft } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function IngredientsPage() {
   return (

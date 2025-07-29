@@ -4,6 +4,65 @@
 const SPOONACULAR_API_KEY = process.env.SPOONACULAR_API_KEY || 'demo-key'
 const SPOONACULAR_BASE_URL = 'https://api.spoonacular.com/recipes'
 
+interface AnalyzedInstruction {
+  name: string
+  steps: Array<{
+    number: number
+    step: string
+    ingredients: Array<{
+      id: number
+      name: string
+      localizedName: string
+      image: string
+    }>
+    equipment: Array<{
+      id: number
+      name: string
+      localizedName: string
+      image: string
+    }>
+  }>
+}
+
+interface ExtendedIngredient {
+  id: number
+  aisle: string
+  amount: number
+  unit: string
+  name: string
+  original: string
+  originalName: string
+  meta: string[]
+  image: string
+}
+
+interface Nutrition {
+  nutrients: Array<{
+    name: string
+    amount: number
+    unit: string
+  }>
+  properties: Array<{
+    name: string
+    amount: number
+    unit: string
+  }>
+  flavonoids: Array<{
+    name: string
+    amount: number
+    unit: string
+  }>
+  caloricBreakdown: {
+    percentProtein: number
+    percentFat: number
+    percentCarbs: number
+  }
+  weightPerServing: {
+    amount: number
+    unit: string
+  }
+}
+
 export interface ExternalRecipe {
   id: number
   title: string
@@ -17,9 +76,9 @@ export interface ExternalRecipe {
   dishTypes: string[]
   diets: string[]
   instructions: string
-  analyzedInstructions: any[]
-  extendedIngredients: any[]
-  nutrition: any
+  analyzedInstructions: AnalyzedInstruction[]
+  extendedIngredients: ExtendedIngredient[]
+  nutrition: Nutrition
   pricePerServing: number
   spoonacularScore: number
   healthScore: number
@@ -56,8 +115,35 @@ export interface RecipeSearchResponse {
   totalResults: number
 }
 
+interface RecipeByIngredientsResult {
+  id: number
+  title: string
+  image: string
+  usedIngredientCount: number
+  missedIngredientCount: number
+  missedIngredients: Array<{
+    id: number
+    amount: number
+    unit: string
+    name: string
+  }>
+  usedIngredients: Array<{
+    id: number
+    amount: number
+    unit: string
+    name: string
+  }>
+  unusedIngredients: Array<{
+    id: number
+    amount: number
+    unit: string
+    name: string
+  }>
+  likes: number
+}
+
 class RecipeAPIService {
-  private async makeRequest(endpoint: string, params: Record<string, any> = {}) {
+  private async makeRequest(endpoint: string, params: Record<string, string | number | boolean> = {}) {
     const url = new URL(`${SPOONACULAR_BASE_URL}${endpoint}`)
 
     // Add API key
@@ -113,7 +199,7 @@ class RecipeAPIService {
     return this.makeRequest('/random', defaultParams)
   }
 
-  async getRecipeByIngredients(ingredients: string[], params: { ranking?: number; ignorePantry?: boolean; number?: number } = {}): Promise<any[]> {
+  async getRecipeByIngredients(ingredients: string[], params: { ranking?: number; ignorePantry?: boolean; number?: number } = {}): Promise<RecipeByIngredientsResult[]> {
     const defaultParams = {
       ranking: 2,
       ignorePantry: true,

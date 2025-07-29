@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 
+export const dynamic = 'force-dynamic'
+
 // In a real app, this would be stored in a database
 // For now, we'll use a simple in-memory store (this will reset on server restart)
 const savedRecipes = new Map<string, Set<string>>()
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth()
 

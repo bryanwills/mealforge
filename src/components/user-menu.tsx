@@ -1,17 +1,10 @@
 "use client";
 
-import { UserButton, useUser, useClerk } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { useUser, useClerk } from "@clerk/nextjs"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { User, Settings, LogOut } from "lucide-react"
 
 export function UserMenu() {
   const { user, isSignedIn } = useUser();
