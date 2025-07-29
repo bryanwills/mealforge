@@ -53,7 +53,7 @@ A comprehensive recipe management and meal planning application built with Next.
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+- Node.js 18+
 - npm, yarn, or pnpm
 - Supabase account
 - Clerk account
@@ -75,19 +75,19 @@ A comprehensive recipe management and meal planning application built with Next.
    ```bash
    cp .env.example .env.local
    ```
-   
+
    Fill in your environment variables:
    ```env
    # Database
    DATABASE_URL="your-supabase-database-url"
-   
+
    # Authentication
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
    CLERK_SECRET_KEY="your-clerk-secret-key"
-   
+
    # APIs
    SPOONACULAR_API_KEY="your-spoonacular-api-key"
-   
+
    # Cookie Consent
    CONSENT_URL="your-consent-url"
    ```
