@@ -1,4 +1,10 @@
 onlyBuiltDependencies:
+  - '@clerk/shared'
+  - '@prisma/client'
+  - '@prisma/engines'
   - '@tailwindcss/oxide'
+  - prisma
+  - protobufjs
   - sharp
+  - tesseract.js
   - unrs-resolver
