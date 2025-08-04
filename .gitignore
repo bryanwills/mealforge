@@ -2,6 +2,7 @@
 .DS_Store
 node_modules/
 examples.md
+/logs
 
 /src/generated/prisma
 
