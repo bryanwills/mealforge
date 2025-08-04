@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
 
-  let evt: any;
+  let evt: unknown;
 
   // Verify the payload with the headers
   try {
@@ -47,14 +47,14 @@ export async function POST(request: NextRequest) {
   }
 
   // Get the ID and type
-  const { id } = evt.data;
-  const eventType = evt.type;
+  const { id } = (evt as { data: { id: string } }).data;
+  const eventType = (evt as { type: string }).type;
 
   console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
   console.log("Webhook body:", body);
 
   if (eventType === "user.created") {
-    const { id, email_addresses, first_name, last_name } = evt.data;
+    const { id, email_addresses, first_name, last_name } = (evt as { data: { id: string; email_addresses: unknown[]; first_name: string; last_name: string } }).data;
 
     try {
       // Check if user already exists
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
       const user = await db.user.create({
         data: {
           clerkId: id,
-          email: email_addresses[0]?.email_address || "",
+          email: (email_addresses[0] as { email_address: string })?.email_address || "",
           firstName: first_name || "",
           lastName: last_name || "",
         },
@@ -89,13 +89,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (eventType === "user.updated") {
-    const { id, email_addresses, first_name, last_name } = evt.data;
+    const { id, email_addresses, first_name, last_name } = (evt as { data: { id: string; email_addresses: unknown[]; first_name: string; last_name: string } }).data;
 
     try {
       const user = await db.user.update({
         where: { clerkId: id },
         data: {
-          email: email_addresses[0]?.email_address || "",
+          email: (email_addresses[0] as { email_address: string })?.email_address || "",
           firstName: first_name || "",
           lastName: last_name || "",
         },
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (eventType === "user.deleted") {
-    const { id } = evt.data;
+    const { id } = (evt as { data: { id: string } }).data;
 
     try {
       await db.user.delete({

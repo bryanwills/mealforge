@@ -3,10 +3,10 @@ import { recipeAPIService, mockExternalRecipes } from "@/lib/recipe-api"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const recipeId = params.id
+    const { id: recipeId } = await params
 
     // Check if it's an external recipe
     if (recipeId.startsWith('external-')) {
@@ -32,7 +32,7 @@ export async function GET(
               unit: (ingredient as { unit: string }).unit,
               original: (ingredient as { original: string }).original
             })) || [],
-            instructions: externalRecipe.analyzedInstructions?.[0]?.steps?.map((step: unknown) => ({
+            instructions: ((externalRecipe.analyzedInstructions as unknown[])?.[0] as { steps?: unknown[] })?.steps?.map((step: unknown) => ({
               number: (step as { number: number }).number,
               step: (step as { step: string }).step
             })) || []

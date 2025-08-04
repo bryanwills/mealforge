@@ -17,7 +17,7 @@ class Logger {
     this.logLevel = LogLevel.DEBUG // Set to DEBUG for detailed logging
   }
 
-  private formatMessage(level: string, message: string, data?: any): string {
+  private formatMessage(level: string, message: string, data?: unknown): string {
     const timestamp = new Date().toISOString()
     const dataStr = data ? ` | ${JSON.stringify(data, null, 2)}` : ''
     return `[${timestamp}] ${level}: ${message}${dataStr}\n`
@@ -37,7 +37,7 @@ class Logger {
     }
   }
 
-  private log(level: LogLevel, levelName: string, message: string, data?: any) {
+  private log(level: LogLevel, levelName: string, message: string, data?: unknown) {
     if (level >= this.logLevel) {
       const formattedMessage = this.formatMessage(levelName, message, data)
       console.log(formattedMessage.trim())
@@ -45,19 +45,19 @@ class Logger {
     }
   }
 
-  debug(message: string, data?: any) {
+  debug(message: string, data?: unknown) {
     this.log(LogLevel.DEBUG, 'DEBUG', message, data)
   }
 
-  info(message: string, data?: any) {
+  info(message: string, data?: unknown) {
     this.log(LogLevel.INFO, 'INFO', message, data)
   }
 
-  warn(message: string, data?: any) {
+  warn(message: string, data?: unknown) {
     this.log(LogLevel.WARN, 'WARN', message, data)
   }
 
-  error(message: string, data?: any) {
+  error(message: string, data?: unknown) {
     this.log(LogLevel.ERROR, 'ERROR', message, data)
   }
 }

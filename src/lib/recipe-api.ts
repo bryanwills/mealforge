@@ -17,9 +17,9 @@ export interface ExternalRecipe {
   dishTypes: string[]
   diets: string[]
   instructions: string
-  analyzedInstructions: any[]
-  extendedIngredients: any[]
-  nutrition: any
+  analyzedInstructions: unknown[]
+  extendedIngredients: unknown[]
+  nutrition: unknown
   pricePerServing: number
   spoonacularScore: number
   healthScore: number
@@ -57,7 +57,7 @@ export interface RecipeSearchResponse {
 }
 
 class RecipeAPIService {
-  private async makeRequest(endpoint: string, params: Record<string, any> = {}) {
+  private async makeRequest(endpoint: string, params: Record<string, unknown> = {}) {
     const url = new URL(`${SPOONACULAR_BASE_URL}${endpoint}`)
 
     // Add API key
@@ -113,7 +113,7 @@ class RecipeAPIService {
     return this.makeRequest('/random', defaultParams)
   }
 
-  async getRecipeByIngredients(ingredients: string[], params: { ranking?: number; ignorePantry?: boolean; number?: number } = {}): Promise<any[]> {
+  async getRecipeByIngredients(ingredients: string[], params: { ranking?: number; ignorePantry?: boolean; number?: number } = {}): Promise<unknown[]> {
     const defaultParams = {
       ranking: 2,
       ignorePantry: true,

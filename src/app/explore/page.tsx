@@ -19,7 +19,7 @@ export default function ExplorePage() {
   const [hasMore, setHasMore] = useState(true)
   const router = useRouter()
 
-  const fetchRecipes = useCallback(async (searchParams: any = {}) => {
+  const fetchRecipes = useCallback(async (searchParams: Record<string, string> = {}) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
@@ -61,7 +61,7 @@ export default function ExplorePage() {
     setActiveFilter(filter)
     setOffset(0)
 
-    const searchParams: any = { offset: "0" }
+    const searchParams: Record<string, string> = { offset: "0" }
 
     switch (filter) {
       case "personal":

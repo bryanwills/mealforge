@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { db as prisma } from './db'
 
 export interface AuthUser {
   id: string

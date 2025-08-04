@@ -9,8 +9,8 @@ export interface ValidationResult {
 
 export interface ValidationIssue {
   field: string
-  expected: any
-  actual: any
+  expected: unknown
+  actual: unknown
   severity: 'error' | 'warning' | 'info'
   message: string
 }

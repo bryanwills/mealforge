@@ -35,7 +35,7 @@ export function RecipeImportPreview({
   const [editingRecipe, setEditingRecipe] = useState<ImportedRecipeData>(safeRecipe)
   const [newTag, setNewTag] = useState('')
 
-  const updateField = (field: keyof ImportedRecipeData, value: any) => {
+  const updateField = (field: keyof ImportedRecipeData, value: unknown) => {
     console.log('Updating field:', field, 'with value:', value)
     setEditingRecipe(prev => ({
       ...prev,

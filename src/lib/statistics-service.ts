@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { db as prisma } from './db'
 import { DataPersistenceService } from './data-persistence'
 import { logger } from './logger'
 
