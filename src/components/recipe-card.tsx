@@ -51,7 +51,10 @@ export function RecipeCard({ recipe, onSave, onView, showSourceIndicator = true 
 
       if (response.ok) {
         setIsSaved(!isSaved)
-        onSave?.(recipe)
+        // Only call onSave for save actions, not unsave
+        if (action === 'save') {
+          onSave?.(recipe)
+        }
       } else {
         console.error('Failed to save/unsave recipe')
       }
