@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Upload } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function NewRecipePage() {
@@ -24,6 +24,12 @@ export default function NewRecipePage() {
             </div>
             <div className="flex items-center space-x-4">
               <ThemeToggle />
+              <Link href="/recipes/import">
+                <Button variant="outline" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import Recipe
+                </Button>
+              </Link>
               <Button variant="outline" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
                 Save Draft
               </Button>
