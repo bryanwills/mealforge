@@ -23,8 +23,8 @@ interface ValidationResult {
   isValid: boolean
   issues: Array<{
     field: string
-    expected: any
-    actual: any
+    expected: unknown
+    actual: unknown
     severity: 'error' | 'warning' | 'info'
     message: string
   }>
@@ -43,7 +43,7 @@ export default function ImportRecipePage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [progress, setProgress] = useState<ImportProgress | null>(null);
-  const [validation, setValidation] = useState<ValidationResult | null>(null);
+  const [validation] = useState<ValidationResult | null>(null);
 
   // Handle file selection
   const handleFileSelect = useCallback((file: File) => {
@@ -146,7 +146,7 @@ export default function ImportRecipePage() {
       } else {
         setError(data.error || 'Failed to import recipe')
       }
-    } catch (error) {
+    } catch {
       setError('Failed to import recipe. Please try again.')
     } finally {
       setIsProcessing(false)

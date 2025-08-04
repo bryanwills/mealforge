@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user's recipes with ingredients
-    const { prisma } = await import('@/lib/prisma')
+    const { db: prisma } = await import('@/lib/db')
 
     const userIngredients = await prisma.recipeIngredient.findMany({
       where: {

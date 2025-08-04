@@ -181,7 +181,7 @@ export default function RecipeDetailPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">Recipe Not Found</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">The recipe you're looking for doesn't exist.</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">The recipe you&apos;re looking for doesn&apos;t exist.</p>
             <Button onClick={() => router.back()}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Go Back

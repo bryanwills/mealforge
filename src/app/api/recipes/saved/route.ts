@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user exists in database
-    let dbUser = await dataService.getUserByClerkId(userId)
+    const dbUser = await dataService.getUserByClerkId(userId)
 
     if (!dbUser) {
       return NextResponse.json(

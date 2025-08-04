@@ -25,16 +25,16 @@ export async function GET(
           // Add ingredients and instructions from the external API
           const detailedRecipe = {
             ...convertedRecipe,
-            ingredients: externalRecipe.extendedIngredients?.map((ingredient: any, index: number) => ({
+            ingredients: externalRecipe.extendedIngredients?.map((ingredient: unknown, index: number) => ({
               id: index + 1,
-              name: ingredient.name,
-              amount: ingredient.amount,
-              unit: ingredient.unit,
-              original: ingredient.original
+              name: (ingredient as { name: string }).name,
+              amount: (ingredient as { amount: number }).amount,
+              unit: (ingredient as { unit: string }).unit,
+              original: (ingredient as { original: string }).original
             })) || [],
-            instructions: externalRecipe.analyzedInstructions?.[0]?.steps?.map((step: any) => ({
-              number: step.number,
-              step: step.step
+            instructions: externalRecipe.analyzedInstructions?.[0]?.steps?.map((step: unknown) => ({
+              number: (step as { number: number }).number,
+              step: (step as { step: string }).step
             })) || []
           }
 
