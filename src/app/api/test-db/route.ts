@@ -1,13 +1,8 @@
-<<<<<<< Updated upstream
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-=======
 import { NextResponse } from 'next/server'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { DataPersistenceService } from '@/lib/data-persistence'
 
 const dataService = new DataPersistenceService()
->>>>>>> Stashed changes
 
 export async function GET() {
   try {
@@ -67,10 +62,6 @@ export async function GET() {
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
-<<<<<<< Updated upstream
-}
-=======
 }
 
 export const dynamic = 'force-dynamic'
->>>>>>> Stashed changes

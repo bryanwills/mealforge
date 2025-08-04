@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, Link as LinkIcon, Camera, FileText, Loader2 } from "lucide-react";
 import Link from "next/link";
-<<<<<<< Updated upstream
-=======
 import { RecipeImportPreview } from "@/components/recipe-import-preview";
 import { ImportedRecipeData } from "@/lib/url-import-service";
 import { useRouter } from "next/navigation";
@@ -19,7 +17,6 @@ interface ImportProgress {
   progress: number
   message: string
 }
->>>>>>> Stashed changes
 
 interface ValidationResult {
   isValid: boolean
@@ -38,15 +35,12 @@ export default function ImportRecipePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [url, setUrl] = useState('');
-<<<<<<< Updated upstream
-=======
   const [extractedRecipe, setExtractedRecipe] = useState<ImportedRecipeData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [progress, setProgress] = useState<ImportProgress | null>(null);
   const [validation, setValidation] = useState<ValidationResult | null>(null);
->>>>>>> Stashed changes
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

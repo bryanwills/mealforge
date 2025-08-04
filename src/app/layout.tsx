@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
-<<<<<<< Updated upstream
-=======
 import { AuthSyncProvider } from "@/components/auth-sync-provider";
 import { Analytics } from "@vercel/analytics/react";
->>>>>>> Stashed changes
 import "./globals.css";
 
 const geistSans = Geist({
@@ -42,14 +39,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-<<<<<<< Updated upstream
-            {children}
-=======
             <AuthSyncProvider>
               {children}
             </AuthSyncProvider>
             <Analytics />
->>>>>>> Stashed changes
           </ThemeProvider>
         </body>
       </html>

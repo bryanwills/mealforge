@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
-<<<<<<< Updated upstream
-
-// In a real app, this would be stored in a database
-// For now, we'll use a simple in-memory store (this will reset on server restart)
-const savedRecipes = new Map<string, Set<string>>()
-=======
 import { RecipeService } from "@/lib/recipe-service"
 import { DataPersistenceService } from "@/lib/data-persistence"
 import { logger } from "@/lib/logger"
 
 const recipeService = new RecipeService()
 const dataService = new DataPersistenceService()
->>>>>>> Stashed changes
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,13 +18,25 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const userSavedRecipes = savedRecipes.get(userId) || new Set()
+    // Check if user exists in database
+    let dbUser = await dataService.getUserByClerkId(userId)
+
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: 'User not found in database' },
+        { status: 404 }
+      )
+    }
+
+    // Get user's saved recipes from database
+    const userRecipes = await recipeService.getUserRecipes(dbUser.id)
+    const savedRecipes = userRecipes.map(recipe => recipe.id)
 
     return NextResponse.json({
-      savedRecipes: Array.from(userSavedRecipes)
+      savedRecipes
     })
   } catch (error) {
-    console.error('Failed to get saved recipes:', error)
+    logger.error('Failed to get saved recipes:', error)
     return NextResponse.json(
       { error: 'Failed to get saved recipes' },
       { status: 500 }
@@ -52,9 +57,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-<<<<<<< Updated upstream
-    const { recipeId, action } = await request.json()
-=======
     // Check if user exists in database
     let dbUser = await dataService.getUserByClerkId(userId)
     logger.debug('Saved recipes - User check', {
@@ -94,7 +96,6 @@ export async function POST(request: NextRequest) {
     }
 
     const { recipeId, action, recipeData } = await request.json()
->>>>>>> Stashed changes
 
     if (!recipeId) {
       return NextResponse.json(
@@ -103,19 +104,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-<<<<<<< Updated upstream
-    // Get or create user's saved recipes set
-    if (!savedRecipes.has(userId)) {
-      savedRecipes.set(userId, new Set())
-    }
-
-    const userSavedRecipes = savedRecipes.get(userId)!
-
-    if (action === 'save') {
-      userSavedRecipes.add(recipeId)
-    } else if (action === 'unsave') {
-      userSavedRecipes.delete(recipeId)
-=======
     if (action === 'save' && recipeData) {
       logger.debug('Attempting to save recipe', {
         clerkUserId: userId,
@@ -171,18 +159,12 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Recipe removed from saved collection'
       })
->>>>>>> Stashed changes
     } else {
       return NextResponse.json(
         { error: 'Invalid action. Use "save" or "unsave"' },
         { status: 400 }
       )
     }
-
-    return NextResponse.json({
-      success: true,
-      savedRecipes: Array.from(userSavedRecipes)
-    })
   } catch (error) {
     logger.error('Failed to save/unsave recipe', { error })
     return NextResponse.json(

@@ -1,10 +1,3 @@
-<<<<<<< Updated upstream
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, ChefHat, ArrowLeft } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
-=======
 "use client"
 
 import { useState, useEffect } from "react"
@@ -26,7 +19,6 @@ interface UserIngredient {
   originalQuantity?: number
   originalUnit?: string
 }
->>>>>>> Stashed changes
 
 export default function IngredientsPage() {
   const [ingredients, setIngredients] = useState<UserIngredient[]>([])
