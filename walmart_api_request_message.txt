@@ -1,0 +1,41 @@
+I am working on designing an app that customers will be able to browse, create, and import recipes using their smartphone camera, 
+or via URL through my web app. They will also have the ability to create meal plans and from the meal plan, add all of the 
+ingredients from their meal plan/recipes chosen, into one complete grocery list, which I am hoping I will be able to allow users 
+to import the entire grocery list into their Walmart account to complete their purchase for pickup or delivery. I am also going to 
+have the ability for user dietary preferences and the ability to substitute ingredients based on their preferences, or with the 
+help of AI, and based on the availability of the product at Walmart. I also want to build an option where, with the help of AI, 
+customers can scan ingredients they have and come up with suggestions for meals, as well as offering users the option of entering 
+in a budget, dietary preferences, and, with the help of AI and their Walmart account, come up with meals. My app will be called 
+MealForge for now, being built under my new startup company Big Brain Coding, and will eventually have its own domain of 
+mealforge.app once I get further along in the development process and have a number of test users willing to test my app. 
+This will be available as a web app and mobile (iOS and Android) at some point.
+
+Hello, I am trying to sign up for API services for an app I am working on building. I am working on designing an app that customers 
+will be able to browse, create, and import recipes using their smartphone camera, or via URL through my web app. They will also have 
+the ability to create meal plans and from the meal plan, add all of the ingredients from their meal plan/recipes chosen, into one
+complete grocery list, which I am hoping I will be able to allow users to import the entire grocery list into their Walmart account 
+to complete their purchase for pickup or delivery. I am also going to have the ability for user dietary preferences and the ability 
+to substitute ingredients based on their preferences, or with the help of AI, and based on the availability of the product at Walmart. 
+I also want to build an option where, with the help of AI, customers can scan ingredients they have and come up with suggestions for 
+meals, as well as offering users the option of entering in a budget, dietary preferences, and, with the help of AI and their Walmart
+account, come up with meals. My app will be called MealForge for now, being built under my new startup company Big Brain Coding, and 
+will eventually have its own domain of mealforge.app once I get further along in the development process and have a number of test 
+users willing to test my app. This will be available as a web app and mobile (iOS and Android) at some point.
+
+Whenever I try to register for a subscription, I get an error after filling out the required fields. I tried multiple options, and I 
+have successfully uploaded my key as the guide indicated. This startup company of mine is brand new, and I haven't generated any 
+revenue yet. The MealForge app will be the first app I am developing under the startup. 
+
+I am only looking to test for myself for now and will eventually have a very small number of test users, 10 or fewer, to ensure it works 
+before I work to publish it. I would like access to any and all available APIs and subscriptions in order for me to bring this idea to 
+life. I am hoping to do this as cheaply as possible, as I am using my own money for this. 
+
+If I am doing something incorrectly, please provide me the guidance to correct it. I have already registered an application in the 
+dashboard for this app.
+
+I do understand that if this app takes off and generates a good amount of traffic, I will probably have to pay for the usage, and my 
+plan is to create a subscription-based model for users to use the Walmart checkout feature to finance the costs.
+
+Thank you for your time,
+
+Bryan

@@ -1,26 +1,76 @@
+<<<<<<< Updated upstream
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+=======
+import { NextResponse } from 'next/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
+import { DataPersistenceService } from '@/lib/data-persistence'
+
+const dataService = new DataPersistenceService()
+>>>>>>> Stashed changes
 
 export async function GET() {
   try {
-    // Test database connection by running a simple query
-    const result = await db.$queryRaw`SELECT 1 as test`;
+    const { userId } = await auth()
+    const user = await currentUser()
+
+    if (!userId || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Test database connection
+    const dbUser = await dataService.getUserByClerkId(userId)
+
+    // If user doesn't exist, try to create them
+    if (!dbUser) {
+      try {
+        const syncedUser = await dataService.syncUserFromAuth(
+          userId,
+          user.emailAddresses?.[0]?.emailAddress || '',
+          user.firstName || undefined,
+          user.lastName || undefined,
+          'clerk'
+        )
+
+        return NextResponse.json({
+          message: 'Database connection successful',
+          userCreated: true,
+          user: {
+            id: syncedUser.id,
+            email: syncedUser.email,
+            clerkId: syncedUser.clerkId
+          }
+        })
+      } catch (syncError) {
+        console.error('Failed to sync user:', syncError)
+        return NextResponse.json({
+          message: 'Database connection successful but user sync failed',
+          userCreated: false,
+          error: syncError instanceof Error ? syncError.message : 'Unknown error'
+        })
+      }
+    }
 
     return NextResponse.json({
-      success: true,
-      message: "Database connection successful",
-      data: result,
-    });
+      message: 'Database connection successful',
+      userExists: true,
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+        clerkId: dbUser.clerkId
+      }
+    })
   } catch (error) {
-    console.error("Database connection error:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Database connection failed",
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    console.error('Database test error:', error)
+    return NextResponse.json({
+      error: 'Database connection failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
+<<<<<<< Updated upstream
 }
+=======
+}
+
+export const dynamic = 'force-dynamic'
+>>>>>>> Stashed changes

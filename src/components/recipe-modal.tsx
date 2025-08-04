@@ -1,24 +1,92 @@
 "use client";
 
+<<<<<<< Updated upstream
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, Star, ExternalLink, X, Save, Share2 } from "lucide-react";
 import { type Recipe } from "@/components/recipe-card";
+=======
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Clock, Users, Star, Heart, Share2, X, ExternalLink, Trash2 } from "lucide-react"
+import { Recipe } from "@/components/recipe-card"
+import Image from "next/image"
+>>>>>>> Stashed changes
 
 interface RecipeModalProps {
   recipe: Recipe;
   isOpen: boolean;
   onClose: () => void;
+  onDelete?: (recipe: Recipe) => void;
 }
 
-export function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProps) {
+export function RecipeModal({ recipe, isOpen, onClose, onDelete }: RecipeModalProps) {
   const [isSaved, setIsSaved] = useState(recipe.isSaved);
 
-  const handleSave = () => {
-    setIsSaved(!isSaved);
-    // TODO: Implement save/unsave functionality
+  const handleSave = async () => {
+    try {
+      const action = isSaved ? 'unsave' : 'save'
+      const response = await fetch('/api/recipes/saved', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipeId: recipe.id,
+          action,
+          recipeData: action === 'save' ? {
+            title: recipe.title,
+            description: recipe.description,
+            imageUrl: recipe.image,
+            prepTime: recipe.prepTime,
+            cookTime: recipe.cookingTime,
+            servings: recipe.servings || 1,
+            difficulty: recipe.difficulty || 'medium',
+            cuisine: '',
+            tags: recipe.tags || [],
+            instructions: [], // Will be populated from external source
+            sourceUrl: recipe.externalUrl,
+            ingredients: [], // Will be populated from external source
+            isPublic: false,
+            isShared: false
+          } : undefined
+        })
+      })
+
+      if (response.ok) {
+        setIsSaved(!isSaved)
+        if (isSaved && onDelete) {
+          // If unsaving, call the delete callback
+          onDelete(recipe)
+        }
+      } else {
+        console.error('Failed to save/unsave recipe')
+      }
+    } catch (error) {
+      console.error('Error saving recipe:', error)
+    }
+  };
+
+  const handleDelete = async () => {
+    if (confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
+      try {
+        const response = await fetch(`/api/recipes/${recipe.id}`, {
+          method: 'DELETE',
+        })
+
+        if (response.ok) {
+          onDelete?.(recipe)
+          onClose()
+        } else {
+          console.error('Failed to delete recipe')
+        }
+      } catch (error) {
+        console.error('Error deleting recipe:', error)
+      }
+    }
   };
 
   const handleShare = () => {
@@ -70,6 +138,17 @@ export function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProps) {
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
+              {recipe.source === 'personal' && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDelete}
+                  className="text-red-600 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </Button>
+              )}
               <Button
                 variant={isSaved ? "default" : "outline"}
                 size="sm"
@@ -79,7 +158,11 @@ export function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProps) {
                   : "text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800"
                 }
               >
+<<<<<<< Updated upstream
                 <Save className="mr-2 h-4 w-4" />
+=======
+                <Heart className={`mr-2 h-4 w-4 ${isSaved ? "fill-current" : ""}`} />
+>>>>>>> Stashed changes
                 {isSaved ? "Saved" : "Save"}
               </Button>
             </div>
@@ -92,9 +175,11 @@ export function RecipeModal({ recipe, isOpen, onClose }: RecipeModalProps) {
             {/* Left Column - Image and Basic Info */}
             <div className="space-y-6">
               <div className="relative">
-                <img
-                  src={recipe.image}
+                <Image
+                  src={recipe.image || '/placeholder-recipe.jpg'}
                   alt={recipe.title}
+                  width={400}
+                  height={256}
                   className="w-full h-64 object-cover rounded-lg"
                 />
                 <div className="absolute top-4 right-4">
