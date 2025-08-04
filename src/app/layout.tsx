@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "@/components/theme-provider";
+import { AuthSyncProvider } from "@/components/auth-sync-provider";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,14 +26,49 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
+  // Check if Clerk publishable key is available
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  // If no publishable key is available, render without Clerk (for static generation)
+  if (!publishableKey) {
+    return (
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           suppressHydrationWarning={true}
         >
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Analytics />
+          </ThemeProvider>
+        </body>
+      </html>
+    );
+  }
+
+  return (
+    <ClerkProvider publishableKey={publishableKey}>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          suppressHydrationWarning={true}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthSyncProvider>
+              {children}
+            </AuthSyncProvider>
+            <Analytics />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -1,221 +1,227 @@
-# MealForge MVP Implementation Plan
+# MealForge Implementation Plan
 
-## Project Overview
-MealForge is a comprehensive recipe management and meal planning application with web, iOS, and Android platforms. The web app serves as the primary platform with mobile apps to follow.
+## Current Status
+- ✅ Basic recipe management (CRUD operations)
+- ✅ User authentication with Clerk
+- ✅ Recipe import from URL (basic implementation)
+- ✅ Recipe import from image (OCR mock)
+- ✅ Recipe saving/unsaving functionality
+- ✅ Ingredients aggregation and conversion
+- ✅ User statistics and dashboard
+- ✅ Recipe search and filtering
+- ✅ Theme switching (light/dark mode)
 
-## Tech Stack
-- **Frontend**: Next.js 15 with App Router
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Clerk
-- **ORM**: Prisma (works with Supabase)
-- **Deployment**: Local development on MacBook Pro, production on VPS
-- **Domain**: mealforge.app
-- **Cookie Banner**: @c15t/nextjs
+## URL Import Accuracy Improvements
 
-## Phase 1: Foundation Setup (Days 1-2)
+### Current Issues Identified
+1. **Low Accuracy (~15%)**: Current import shows poor ingredient parsing and incorrect instructions
+2. **Title Extraction**: Not properly extracting "Butterfinger Bars" from URL path
+3. **Ingredient Parsing**: All ingredients showing as "1 piece" instead of proper quantities
+4. **Instruction Accuracy**: Completely wrong instructions being imported
+5. **Image Import**: No images being extracted from recipe pages
+6. **URL Handling**: No referral link removal or URL cleaning
 
-### 1.1 Fix Tailwind Configuration
-- Update `tailwind.config.js` to match shadcn/ui requirements
-- Verify proper content paths and theme configuration
-- Test dark/light/system mode functionality
+### Proposed Solutions (Prioritized)
 
-### 1.2 Database Setup
-- Install Prisma CLI and client
-- Configure Prisma with Supabase connection
-- Create database schema based on recipehub-monorepo-docs.md
-- Set up environment variables for Supabase
-- Generate Prisma client
+#### Phase 1: Immediate Improvements (Next Steps #1, #4, #5)
+**Target: 60-80% accuracy improvement**
 
-### 1.3 Install Dependencies
-- Core dependencies: `@prisma/client`, `@dnd-kit/core`, `@dnd-kit/sortable`
-- UI libraries: `framer-motion`, `@c15t/nextjs`
-- Utilities: `tesseract.js`, `zod`
-- Authentication: Clerk SDK
-- Additional shadcn/ui components
+1. **Enhanced Web Scraping with Print URL Detection**
+   - Detect print-friendly URLs (e.g., `/wprm_print/`, `/print/`, `/print-recipe/`)
+   - Automatically redirect to print version when available
+   - Parse cleaner HTML structure from print pages
+   - Implement fallback to original URL if print version unavailable
 
-### 1.4 Project Structure Setup
-- Create proper folder structure for scalability
-- Set up API routes structure
-- Configure Clerk authentication
-- Set up cookie banner
+2. **Improved Ingredient Parsing with AI-like Logic**
+   - Enhanced regex patterns for quantity/unit extraction
+   - Fraction parsing (1 1/2 cups → 1.5 cups)
+   - Unit normalization (tbsp → tablespoon)
+   - Ingredient name cleaning and categorization
 
-## Phase 2: Core Features (Days 3-6)
+3. **Better Title and Metadata Extraction**
+   - URL path analysis for title extraction
+   - Schema.org structured data parsing
+   - Meta tag extraction for description and images
+   - Social media meta tags (Open Graph, Twitter Cards)
 
-### 2.1 Authentication System
-- Implement Clerk authentication
-- Create protected routes
-- User profile management
-- Session handling
+#### Phase 2: Advanced Solutions (Next Steps #2, #3)
+**Target: 85-95% accuracy**
 
-### 2.2 Recipe Management
-- Recipe CRUD operations
-- Recipe display components
-- Recipe search and filtering
-- Recipe categories and tags
+4. **Professional Recipe Scraping Service Integration**
+   - Recipe Keeper API integration
+   - Zestful API for ingredient parsing
+   - Chefkoch API for recipe data extraction
+   - Fallback to custom scraping if APIs fail
 
-### 2.3 Ingredient Database
-- Ingredient CRUD operations
-- Unit conversion system
-- Nutritional information
-- Ingredient substitutions
+5. **AI-Powered Ingredient Parsing**
+   - OpenAI GPT-4 integration for ingredient parsing
+   - Claude API for recipe structure analysis
+   - Local AI models for privacy-sensitive parsing
+   - Machine learning for continuous improvement
 
-### 2.4 Basic UI Components
-- Navigation components
-- Recipe cards
-- Forms for recipe creation
-- Modal components
-- Loading states
+#### Phase 3: Production-Ready Solutions
+**Target: 95%+ accuracy**
 
-## Phase 3: Advanced Features (Days 7-10)
+6. **Headless Browser Scraping (Puppeteer/Playwright)**
+   - Full browser rendering for JavaScript-heavy sites
+   - Screenshot capture for recipe images
+   - Dynamic content extraction
+   - Anti-bot detection bypass
 
-### 3.1 Recipe Import Features
-- URL-based recipe import
-- OCR/Tesseract for recipe image processing
-- Public API integration for recipe fetching
-- Recipe parsing and validation
+7. **Multi-Source Aggregation**
+   - Combine multiple scraping methods
+   - Confidence scoring for each data point
+   - User feedback integration for accuracy improvement
+   - A/B testing for different parsing strategies
 
-### 3.2 Portion Scaling System
-- Dynamic portion scaling (1/4x to 4x)
-- Real-time ingredient quantity updates
-- Unit conversion during scaling
-- Visual portion indicators
+## Implementation Details
 
-### 3.3 Meal Planning
-- Weekly/monthly meal planning
-- Drag-and-drop meal scheduling
-- Recipe calendar view
-- Meal plan sharing
+### Print URL Detection Logic
 
-### 3.4 Grocery List Generation
-- Automatic grocery list creation from meal plans
-- Ingredient aggregation and deduplication
-- Category-based grocery organization
-- Export and sharing capabilities
+```typescript
+interface PrintURLPatterns {
+  pattern: RegExp
+  replacement: string
+  priority: number
+}
 
-## Phase 4: MVP Polish (Days 11-14)
+const PRINT_URL_PATTERNS: PrintURLPatterns[] = [
+  {
+    pattern: /^https:\/\/[^\/]+\/([^\/]+)$/,
+    replacement: 'https://$1/wprm_print/$2',
+    priority: 1
+  },
+  {
+    pattern: /^https:\/\/[^\/]+\/([^\/]+)\/([^\/]+)$/,
+    replacement: 'https://$1/print/$2',
+    priority: 2
+  },
+  {
+    pattern: /^https:\/\/[^\/]+\/([^\/]+)\/([^\/]+)$/,
+    replacement: 'https://$1/print-recipe/$2',
+    priority: 3
+  }
+]
+```
 
-### 4.1 Responsive Design
-- Mobile-first responsive design
-- Tablet and desktop optimizations
-- Touch-friendly interactions
+### Enhanced Scraping Strategy
 
-### 4.2 Error Handling & Validation
-- Comprehensive error handling
-- Form validation with Zod
-- User-friendly error messages
-- Loading states and feedback
+1. **Primary**: Try print-friendly URL first
+2. **Secondary**: Fallback to original URL with enhanced selectors
+3. **Tertiary**: Use professional API services
+4. **Quaternary**: AI-powered parsing for difficult cases
 
-### 4.3 Performance Optimization
-- Image optimization
-- Code splitting
-- Database query optimization
-- Caching strategies
+### Accuracy Metrics
 
-### 4.4 Testing & Quality Assurance
-- Unit tests for core functionality
-- Integration tests for API routes
-- E2E testing for critical user flows
-- Performance testing
+- **Title Accuracy**: 95%+ (extract from URL path)
+- **Ingredient Accuracy**: 85%+ (proper quantities and units)
+- **Instruction Accuracy**: 90%+ (correct step-by-step)
+- **Image Accuracy**: 70%+ (extract recipe images)
+- **Metadata Accuracy**: 80%+ (time, servings, difficulty)
 
-## Phase 5: Mobile App Planning (Future)
+## Technical Considerations
 
-### 5.1 iOS App (React Native or Native Swift)
-- Based on UltimateRecipeHub Xcode project
-- Sync with web app data
-- Offline functionality
-- Push notifications
+### Multiple Solution Integration
+**No conflicts expected** - Each solution can be implemented as a fallback chain:
 
-### 5.2 Android App
-- Cross-platform or native Android
-- Feature parity with iOS
-- Google Play Store optimization
+1. **Print URL Detection** → **Enhanced Scraping** → **Professional APIs** → **AI Parsing**
+2. **Confidence Scoring**: Each method provides confidence score
+3. **User Feedback**: Allow users to correct and improve accuracy
+4. **Caching**: Store successful parsing patterns for future use
 
-### 5.3 Mobile-Specific Features
-- Camera integration for recipe photos
-- Barcode scanning for ingredients
-- Voice commands for hands-free cooking
-- Smart notifications for meal prep
+### Performance Considerations
+- **Print URLs**: Faster parsing (cleaner HTML)
+- **API Services**: Rate limiting and cost management
+- **AI Services**: Token usage optimization
+- **Browser Scraping**: Resource-intensive, use sparingly
 
-## Phase 6: E-commerce Integration (Future)
+### Error Handling
+- **Graceful Degradation**: Fallback to simpler methods
+- **User Notification**: Clear error messages with suggestions
+- **Retry Logic**: Automatic retry with different methods
+- **Manual Override**: Allow users to manually edit imported data
 
-### 6.1 Walmart Integration
-- API integration for product search
-- Shopping cart management
-- Order placement automation
+## Implementation Timeline
 
-### 6.2 Kroger Integration
-- Product catalog integration
-- Price comparison features
-- Loyalty program integration
+### Week 1: Print URL Detection & Enhanced Scraping
+- [ ] Implement print URL detection logic
+- [ ] Update scraping selectors for print pages
+- [ ] Test with iambaker.net and similar sites
+- [ ] Add fallback to original URL
 
-## Key Features for MVP
+### Week 2: Professional API Integration
+- [ ] Research and select primary API service
+- [ ] Implement API integration with error handling
+- [ ] Add rate limiting and cost management
+- [ ] Test accuracy improvements
 
-### Core Recipe Features
-- ✅ Recipe creation and editing
-- ✅ Recipe import via URL
-- ✅ OCR recipe scanning
-- ✅ Portion scaling (1/4x to 4x)
-- ✅ Ingredient management
-- ✅ Unit conversion
+### Week 3: AI-Powered Parsing
+- [ ] Integrate OpenAI API for ingredient parsing
+- [ ] Implement confidence scoring system
+- [ ] Add user feedback collection
+- [ ] Optimize token usage
 
-### Meal Planning
-- ✅ Weekly meal planning
-- ✅ Drag-and-drop scheduling
-- ✅ Recipe calendar view
-
-### Grocery Management
-- ✅ Automatic grocery list generation
-- ✅ Ingredient aggregation
-- ✅ Category organization
-- ✅ Export capabilities
-
-### User Experience
-- ✅ Dark/light/system theme
-- ✅ Responsive design
-- ✅ Intuitive navigation
-- ✅ Fast loading times
-
-## Technical Requirements
-
-### Database Schema
-- Users (Clerk integration)
-- Recipes (with ingredients, instructions)
-- Ingredients (with nutritional data)
-- Meal Plans
-- Grocery Lists
-- User Preferences
-
-### API Endpoints
-- Recipe CRUD operations
-- Ingredient management
-- Meal planning
-- Grocery list generation
-- Recipe import/parsing
-
-### Security
-- Clerk authentication
-- Row Level Security (RLS) in Supabase
-- API route protection
-- Data validation
+### Week 4: Production Optimization
+- [ ] Implement caching for successful patterns
+- [ ] Add comprehensive error handling
+- [ ] Performance optimization
+- [ ] User experience improvements
 
 ## Success Metrics
-- ✅ Functional recipe management
-- ✅ Working meal planning
-- ✅ Grocery list generation
-- ✅ Responsive design
-- ✅ Dark/light mode
-- ✅ No critical bugs
-- ✅ Good performance
 
-## Timeline
-- **Week 1**: Foundation and core features
-- **Week 2**: Advanced features and polish
-- **Future**: Mobile apps and e-commerce integration
+### Accuracy Targets
+- **Phase 1**: 60-80% accuracy improvement
+- **Phase 2**: 85-95% accuracy
+- **Phase 3**: 95%+ accuracy
+
+### User Experience
+- **Import Success Rate**: >90%
+- **User Satisfaction**: >4.5/5 stars
+- **Manual Corrections**: <20% of imports
+- **Processing Time**: <10 seconds per import
+
+### Technical Performance
+- **API Response Time**: <5 seconds
+- **Error Rate**: <5%
+- **Cost per Import**: <$0.01
+- **Scalability**: Support 1000+ imports/day
 
 ## Risk Mitigation
-- Start with core features, add complexity gradually
-- Use established libraries (Clerk, Prisma, shadcn/ui)
-- Regular testing and validation
-- Backup and version control
-- Performance monitoring from the start
+
+### API Dependencies
+- **Multiple Providers**: Reduce single point of failure
+- **Fallback Chains**: Always have backup methods
+- **Cost Monitoring**: Track API usage and costs
+- **Rate Limiting**: Respect API limits
+
+### Accuracy Concerns
+- **User Feedback Loop**: Learn from corrections
+- **A/B Testing**: Compare different methods
+- **Manual Override**: Always allow user editing
+- **Transparency**: Show confidence scores to users
+
+### Performance Issues
+- **Caching Strategy**: Cache successful patterns
+- **Async Processing**: Don't block UI during import
+- **Progress Indicators**: Show import progress
+- **Timeout Handling**: Graceful timeout management
+
+## Future Enhancements
+
+### Advanced Features
+- **Recipe Validation**: Check for common recipe patterns
+- **Nutrition Calculation**: Auto-calculate nutrition facts
+- **Ingredient Substitution**: Suggest ingredient alternatives
+- **Recipe Scaling**: Adjust quantities for different servings
+
+### User Experience
+- **Import History**: Track successful import patterns
+- **Favorite Sources**: Remember user's preferred sites
+- **Batch Import**: Import multiple recipes at once
+- **Recipe Templates**: Pre-defined recipe structures
+
+### Integration Opportunities
+- **Grocery List Integration**: Auto-add ingredients to lists
+- **Meal Planning**: Suggest recipes based on ingredients
+- **Social Sharing**: Share imported recipes
+- **Recipe Rating**: Rate imported recipe accuracy

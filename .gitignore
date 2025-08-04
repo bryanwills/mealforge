@@ -1,8 +1,15 @@
+# Environment files - ALL environment files should be ignored
 .env
+.env*
+.env.local
+.env.backup*
+.env.production
+.env.development
+.env.test
 .DS_Store
 node_modules/
 examples.md
-
+/logs
 /src/generated/prisma
 
 # Next.js

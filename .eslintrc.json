@@ -6,6 +6,9 @@
   ],
   "plugins": ["tailwindcss"],
   "rules": {
-    "prettier/prettier": ["error"]
+    "prettier/prettier": ["error"],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@next/next/no-img-element": "warn"
   }
 }

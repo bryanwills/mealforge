@@ -1,0 +1,269 @@
+{
+  "timestamp": "2025-07-31T07:45:11.369Z",
+  "users": [
+    {
+      "id": "530c625a-c125-40ee-86d5-161f6fd3ce4e",
+      "clerkId": "user_30HWzA9KPhLSFfghlBkFlZ1s2y8",
+      "email": "bryanwi09@gmail.com",
+      "firstName": "Bryan",
+      "lastName": "Wills",
+      "preferences": {},
+      "createdAt": "2025-07-31T00:25:49.684Z",
+      "updatedAt": "2025-07-31T07:35:37.820Z"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "c5578f14-ea41-4def-b57f-30f8a80da2ea",
+      "userId": "530c625a-c125-40ee-86d5-161f6fd3ce4e",
+      "title": "Asparagus and Pea Soup: Real Convenience Food",
+      "description": "Asparagus and Pea Soup: Real Convenience Food requires approximately 20 minutes from start to finish. Watching your figure? This gluten free, dairy free, paleolithic, and lacto ovo vegetarian recipe has 217 calories, 11g of protein, and 8g of fat per serving. This recipe serves 2. For $1.78 per serving, this recipe covers 25% of your daily requirements of vitamins and minerals. Autumn will be even more special with this recipe. It works well as a hor d'oeuvre. 207 people have tried and liked this recipe. It is brought to you by fullbellysisters.blogspot.com. A mixture of vegetable broth, evoo, garlic, and a handful of other ingredients are all it takes to make this recipe so yummy. All things considered, we decided this recipe deserves a spoonacular score of 96%. This score is outstanding. Try Asparagus and Pea Soup: Real Convenience Food, Asparagus and Pea Soup: Real Convenience Food, and Asparagus and Pea Soup: Real Convenience Food for similar recipes.",
+      "imageUrl": "https://img.spoonacular.com/recipes/716406-312x231.jpg",
+      "prepTime": null,
+      "cookTime": 20,
+      "servings": 2,
+      "difficulty": "Medium",
+      "cuisine": "",
+      "tags": [
+        "antipasti",
+        "soup",
+        "starter",
+        "snack",
+        "appetizer",
+        "antipasto",
+        "hor d'oeuvre",
+        "gluten free",
+        "dairy free",
+        "paleolithic",
+        "lacto ovo vegetarian",
+        "primal",
+        "vegan"
+      ],
+      "instructions": [],
+      "sourceUrl": "https://fullbellysisters.blogspot.com/2011/03/asparagus-and-pea-soup-real-convenience.html",
+      "isPublic": false,
+      "isShared": false,
+      "calories": null,
+      "nutrition": null,
+      "importSource": "external",
+      "importAccuracy": null,
+      "createdAt": "2025-07-31T06:04:23.526Z",
+      "updatedAt": "2025-07-31T06:04:23.526Z"
+    },
+    {
+      "id": "ab2f9259-da5b-4cc0-ac85-b12da3000112",
+      "userId": "530c625a-c125-40ee-86d5-161f6fd3ce4e",
+      "title": "Easy Homemade Rice and Beans",
+      "description": "Easy Homemade Rice and Beans is a main course that serves 2. One serving contains 446 calories, 19g of protein, and 4g of fat. For $1.06 per serving, this recipe covers 26% of your daily requirements of vitamins and minerals. A mixture of optional: of hot sauce, canned tomatoes, water, and a handful of other ingredients are all it takes to make this recipe so yummy. This recipe from cooking2perfection.blogspot.com has 471 fans. It is a good option if you're following a gluten free, dairy free, lacto ovo vegetarian, and vegan diet. From preparation to the plate, this recipe takes around 35 minutes. Overall, this recipe earns a tremendous spoonacular score of 98%. Easy Homemade Rice and Beans, Easy Homemade Rice and Beans, and Easy Homemade Rice and Beans are very similar to this recipe.",
+      "imageUrl": "https://img.spoonacular.com/recipes/716627-312x231.jpg",
+      "prepTime": null,
+      "cookTime": 35,
+      "servings": 2,
+      "difficulty": "Medium",
+      "cuisine": "",
+      "tags": [
+        "side dish",
+        "lunch",
+        "main course",
+        "main dish",
+        "dinner",
+        "gluten free",
+        "dairy free",
+        "lacto ovo vegetarian",
+        "vegan"
+      ],
+      "instructions": [],
+      "sourceUrl": "http://cooking2perfection.blogspot.com/2012/11/easy-homemade-rice-and-beans.html",
+      "isPublic": false,
+      "isShared": false,
+      "calories": null,
+      "nutrition": null,
+      "importSource": "external",
+      "importAccuracy": null,
+      "createdAt": "2025-07-31T06:05:19.924Z",
+      "updatedAt": "2025-07-31T06:05:19.924Z"
+    }
+  ],
+  "ingredients": [
+    {
+      "id": "01fe3dbb-aa32-4c89-9d98-f2bdc231a7c5",
+      "name": "2 1/4 cups all-purpose flour",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:18.673Z",
+      "updatedAt": "2025-07-31T06:11:18.673Z"
+    },
+    {
+      "id": "93141124-88ff-42d1-a591-3096ed35a9a1",
+      "name": "1 cup butter, softened",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:18.866Z",
+      "updatedAt": "2025-07-31T06:11:18.866Z"
+    },
+    {
+      "id": "36dc4b31-708e-405d-95ff-b40fcc4ef9af",
+      "name": "3/4 cup granulated sugar",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:19.052Z",
+      "updatedAt": "2025-07-31T06:11:19.052Z"
+    },
+    {
+      "id": "c04cf140-01d5-4f65-812a-cf0ed6e9eeab",
+      "name": "3/4 cup packed brown sugar",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:19.238Z",
+      "updatedAt": "2025-07-31T06:11:19.238Z"
+    },
+    {
+      "id": "b1e88e4a-7658-486b-bc17-203697f11b3a",
+      "name": "2 large eggs",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:19.426Z",
+      "updatedAt": "2025-07-31T06:11:19.426Z"
+    },
+    {
+      "id": "071ff01c-ccb4-4137-b079-ab80a2fe5f52",
+      "name": "1 tsp vanilla extract",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:19.616Z",
+      "updatedAt": "2025-07-31T06:11:19.616Z"
+    },
+    {
+      "id": "510593d3-2508-4ed4-87a5-a7f971cb8728",
+      "name": "1 tsp baking soda",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:19.809Z",
+      "updatedAt": "2025-07-31T06:11:19.809Z"
+    },
+    {
+      "id": "e514c6fd-a43b-4134-a31c-a06453f0ad91",
+      "name": "1/2 tsp salt",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:19.997Z",
+      "updatedAt": "2025-07-31T06:11:19.997Z"
+    },
+    {
+      "id": "02bbde73-48f4-413d-a713-0cd6e320ed82",
+      "name": "2 cups chocolate chips",
+      "category": "unknown",
+      "commonUnits": [
+        "g"
+      ],
+      "caloriesPerGram": null,
+      "proteinPerGram": null,
+      "carbsPerGram": null,
+      "fatPerGram": null,
+      "fiberPerGram": null,
+      "sugarPerGram": null,
+      "sodiumPerGram": null,
+      "conversionFactors": null,
+      "isActive": true,
+      "createdAt": "2025-07-31T06:11:20.186Z",
+      "updatedAt": "2025-07-31T06:11:20.186Z"
+    }
+  ],
+  "recipeIngredients": [],
+  "recipeLikes": [],
+  "recipeShares": [],
+  "groceryLists": [],
+  "groceryListItems": [],
+  "mealPlans": [],
+  "mealPlanItems": [],
+  "substitutions": [],
+  "importCorrections": []
+}
