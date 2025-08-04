@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Link as LinkIcon, Camera, FileText, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Upload, Link as LinkIcon, Camera, FileText, Loader2, AlertCircle, CheckCircle, Image as ImageIcon, X } from "lucide-react";
 import Link from "next/link";
 import { RecipeImportPreview } from "@/components/recipe-import-preview";
 import { ImportedRecipeData } from "@/lib/url-import-service";
@@ -31,6 +32,8 @@ interface ValidationResult {
 }
 
 export default function ImportRecipePage() {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [importMethod, setImportMethod] = useState<'image' | 'url' | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -42,26 +45,24 @@ export default function ImportRecipePage() {
   const [progress, setProgress] = useState<ImportProgress | null>(null);
   const [validation, setValidation] = useState<ValidationResult | null>(null);
 
+  // Handle file selection
+  const handleFileSelect = useCallback((file: File) => {
+    if (file && file.type.startsWith('image/')) {
+      setImageFile(file);
+      setError(null);
+    } else {
+      setError('Please select a valid image file (PNG, JPG, JPEG)');
+    }
+  }, []);
+
+  // Handle file input change
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setImageFile(file);
+      handleFileSelect(file);
     }
   };
 
-<<<<<<< Updated upstream
-  const handleUrlSubmit = async () => {
-    if (!url.trim()) return;
-
-    setIsProcessing(true);
-    try {
-      // TODO: Implement URL recipe extraction
-      console.log('Processing URL:', url);
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    } catch (error) {
-      console.error('Error processing URL:', error);
-=======
   // Handle drag and drop
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -147,7 +148,6 @@ export default function ImportRecipePage() {
       }
     } catch (error) {
       setError('Failed to import recipe. Please try again.')
->>>>>>> Stashed changes
     } finally {
       setIsProcessing(false)
     }
@@ -157,13 +157,14 @@ export default function ImportRecipePage() {
     if (!imageFile) return;
 
     setIsProcessing(true);
+    setError(null);
+    setProgress({
+      status: 'initializing',
+      progress: 0,
+      message: 'Initializing OCR service...'
+    });
+
     try {
-<<<<<<< Updated upstream
-      // TODO: Implement OCR processing with Tesseract.js
-      console.log('Processing image:', imageFile.name);
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
-=======
       const formData = new FormData();
       formData.append('importType', 'image');
       formData.append('imageFile', imageFile);
@@ -190,16 +191,19 @@ export default function ImportRecipePage() {
       } else {
         throw new Error('Invalid response from server');
       }
->>>>>>> Stashed changes
     } catch (error) {
       console.error('Error processing image:', error);
+      setError(error instanceof Error ? error.message : 'Failed to extract recipe from image. Please try again with a clearer image.');
+      setProgress({
+        status: 'error',
+        progress: 0,
+        message: error instanceof Error ? error.message : 'Extraction failed'
+      });
     } finally {
       setIsProcessing(false);
     }
   };
 
-<<<<<<< Updated upstream
-=======
   const handleSaveRecipe = async () => {
     setIsProcessing(true);
     try {
@@ -237,7 +241,6 @@ export default function ImportRecipePage() {
     }
   };
 
->>>>>>> Stashed changes
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
       <Navigation />
@@ -251,8 +254,6 @@ export default function ImportRecipePage() {
           </p>
         </div>
 
-<<<<<<< Updated upstream
-=======
         {/* Progress Bar */}
         {progress && (
           <div className="mb-6 p-4 bg-white/70 dark:bg-gray-800/70 border border-orange-200 dark:border-gray-700 rounded-lg">
@@ -310,7 +311,6 @@ export default function ImportRecipePage() {
           />
         )}
 
->>>>>>> Stashed changes
         {/* Import Methods */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card
@@ -381,22 +381,53 @@ export default function ImportRecipePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="border-2 border-dashed border-orange-300 dark:border-orange-600 rounded-lg p-8 text-center">
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                  isDragOver
+                    ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                    : 'border-orange-300 dark:border-orange-600'
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 <Upload className="mx-auto h-12 w-12 text-orange-500 dark:text-orange-400 mb-4" />
-                <Label htmlFor="image-upload" className="cursor-pointer">
-                  <div className="space-y-2">
-                    <p className="text-gray-600 dark:text-gray-300">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-2">
                       Click to upload or drag and drop
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       PNG, JPG, JPEG up to 10MB
                     </p>
                   </div>
-                </Label>
+
+                  {/* Mobile-friendly buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                    <Button
+                      onClick={handleMobileImageCapture}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <Camera className="h-4 w-4" />
+                      Take Photo
+                    </Button>
+                    <Button
+                      onClick={handleMobileImageCapture}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                      Choose from Gallery
+                    </Button>
+                  </div>
+                </div>
+
                 <Input
-                  id="image-upload"
+                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
+                  capture="environment"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
@@ -404,9 +435,9 @@ export default function ImportRecipePage() {
 
               {imageFile && (
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-4 w-4 text-orange-500 dark:text-orange-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center space-x-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <ImageIcon className="h-4 w-4 text-green-500" />
+                    <span className="text-sm text-green-700 dark:text-green-300">
                       Selected: {imageFile.name}
                     </span>
                   </div>

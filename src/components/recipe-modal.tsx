@@ -1,20 +1,11 @@
 "use client";
 
-<<<<<<< Updated upstream
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Users, Star, ExternalLink, X, Save, Share2 } from "lucide-react";
-import { type Recipe } from "@/components/recipe-card";
-=======
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Users, Star, Heart, Share2, X, ExternalLink, Trash2 } from "lucide-react"
 import { Recipe } from "@/components/recipe-card"
 import Image from "next/image"
->>>>>>> Stashed changes
 
 interface RecipeModalProps {
   recipe: Recipe;
@@ -158,11 +149,7 @@ export function RecipeModal({ recipe, isOpen, onClose, onDelete }: RecipeModalPr
                   : "text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800"
                 }
               >
-<<<<<<< Updated upstream
-                <Save className="mr-2 h-4 w-4" />
-=======
                 <Heart className={`mr-2 h-4 w-4 ${isSaved ? "fill-current" : ""}`} />
->>>>>>> Stashed changes
                 {isSaved ? "Saved" : "Save"}
               </Button>
             </div>

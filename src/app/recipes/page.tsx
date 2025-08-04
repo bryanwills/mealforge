@@ -3,13 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Search, Filter, Globe, Loader2, Upload } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Navigation } from "@/components/navigation"
-<<<<<<< Updated upstream
-import { RecipeCard, type Recipe } from "@/components/recipe-card"
-import { RecipeModal } from "@/components/recipe-modal"
-=======
 import { Plus, Search, Filter, Globe, Upload, Loader2 } from "lucide-react"
 import { RecipeCard, type Recipe } from "@/components/recipe-card"
 import { RecipeModal } from "@/components/recipe-modal"
@@ -44,71 +39,18 @@ interface DatabaseRecipe {
     }
   }>
 }
->>>>>>> Stashed changes
 
 export default function RecipesPage() {
-  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [recipes, setRecipes] = useState<DatabaseRecipe[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchSavedRecipes = async () => {
-      try {
-        const response = await fetch('/api/recipes/saved')
-        if (response.ok) {
-          const data = await response.json()
-          // For now, we'll use mock data for the saved recipes
-          // In a real app, you'd fetch the full recipe details from your database
-          const mockSavedRecipes: Recipe[] = [
-            {
-              id: 'external-1',
-              title: 'Spaghetti Carbonara',
-              description: 'Classic Italian pasta dish with eggs, cheese, and pancetta',
-              image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop',
-              cookingTime: 20,
-              servings: 4,
-              difficulty: 'Medium',
-              tags: ['Italian', 'Pasta', 'Quick'],
-              source: 'external',
-              externalId: '1',
-              externalSource: 'Spoonacular',
-              rating: 4.5,
-              isSaved: true
-            },
-            {
-              id: 'external-2',
-              title: 'Chicken Tikka Masala',
-              description: 'Creamy and flavorful Indian curry with tender chicken',
-              image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop',
-              cookingTime: 45,
-              servings: 6,
-              difficulty: 'Medium',
-              tags: ['Indian', 'Curry', 'Spicy'],
-              source: 'external',
-              externalId: '2',
-              externalSource: 'Spoonacular',
-              rating: 4.8,
-              isSaved: true
-            }
-          ]
-          setSavedRecipes(mockSavedRecipes)
-        }
-      } catch (error) {
-        console.error('Failed to fetch saved recipes:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchSavedRecipes()
+    fetchRecipes()
   }, [])
 
-<<<<<<< Updated upstream
-  const handleSaveRecipe = (recipe: Recipe) => {
-    // Remove from saved recipes when unsaved
-    setSavedRecipes(prev => prev.filter(r => r.id !== recipe.id))
-=======
   const fetchRecipes = async () => {
     try {
       setLoading(true)
@@ -142,7 +84,6 @@ export default function RecipesPage() {
       isSaved: true, // All recipes on this page are saved by definition
       externalSource: dbRecipe.importSource
     }
->>>>>>> Stashed changes
   }
 
   const handleViewRecipe = (recipe: Recipe) => {
@@ -150,8 +91,6 @@ export default function RecipesPage() {
     setIsModalOpen(true)
   }
 
-<<<<<<< Updated upstream
-=======
   const handleSaveRecipe = async (recipe: Recipe) => {
     try {
       // Since these are already saved recipes, this would be an unsave action
@@ -209,7 +148,6 @@ export default function RecipesPage() {
     )
   }
 
->>>>>>> Stashed changes
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
       <Navigation />
@@ -254,14 +192,7 @@ export default function RecipesPage() {
         </div>
 
         {/* Recipe Grid */}
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              <span>Loading your recipes...</span>
-            </div>
-          </div>
-        ) : savedRecipes.length === 0 ? (
+        {recipes.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Empty State */}
             <Card className="col-span-full text-center py-12 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700">
@@ -296,10 +227,10 @@ export default function RecipesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {savedRecipes.map((recipe) => (
+            {recipes.map((recipe) => (
               <RecipeCard
                 key={recipe.id}
-                recipe={recipe}
+                recipe={convertDatabaseRecipeToUIRecipe(recipe)}
                 onSave={handleSaveRecipe}
                 onView={handleViewRecipe}
               />
