@@ -10,6 +10,7 @@ export default function SignUpPage() {
             Create your account to access your comprehensive recipe management and meal planning companion
           </p>
         </div>
+<<<<<<< Updated upstream
         <SignUp
           appearance={{
             elements: {
@@ -57,6 +58,12 @@ export default function SignUpPage() {
           signInUrl="/sign-in"
           redirectUrl="/"
         />
+=======
+
+        <div className="flex justify-center">
+          <SignUp />
+        </div>
+>>>>>>> Stashed changes
       </div>
     </div>
   );
