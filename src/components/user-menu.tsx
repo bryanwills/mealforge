@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, User, Settings, LogOut } from "lucide-react";
 
-export function UserMenu() {
+function UserMenuWithClerk() {
   const { user, isSignedIn } = useUser();
   const { signOut } = useClerk();
 
@@ -76,4 +76,20 @@ export function UserMenu() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
+}
+
+export function UserMenu() {
+  // Check if Clerk is available
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+  if (!publishableKey) {
+    // Return a placeholder when Clerk is not available (for static generation)
+    return (
+      <Button variant="outline" size="sm" className="text-gray-700 dark:text-gray-300 border-orange-200 dark:border-gray-600 hover:bg-orange-50 dark:hover:bg-gray-800">
+        Sign In
+      </Button>
+    );
+  }
+
+  return <UserMenuWithClerk />;
 }
