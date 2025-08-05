@@ -54,6 +54,7 @@ export function UserMenu() {
             <p className="text-xs leading-none text-gray-600 dark:text-gray-300">
               {user?.emailAddresses[0]?.emailAddress}
             </p>
+
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-orange-200 dark:bg-gray-700" />
