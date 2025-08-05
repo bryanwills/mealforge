@@ -10,61 +10,43 @@ import { RecipeCard, type Recipe } from "@/components/recipe-card"
 import { RecipeModal } from "@/components/recipe-modal"
 
 export default function RecipesPage() {
+  const [personalRecipes, setPersonalRecipes] = useState<Recipe[]>([])
   const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    const fetchSavedRecipes = async () => {
+    const fetchRecipes = async () => {
       try {
-        const response = await fetch('/api/recipes/saved')
-        if (response.ok) {
-          const data = await response.json()
-          // For now, we'll use mock data for the saved recipes
-          // In a real app, you'd fetch the full recipe details from your database
-          const mockSavedRecipes: Recipe[] = [
-            {
-              id: 'external-1',
-              title: 'Spaghetti Carbonara',
-              description: 'Classic Italian pasta dish with eggs, cheese, and pancetta',
-              image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop',
-              cookingTime: 20,
-              servings: 4,
-              difficulty: 'Medium',
-              tags: ['Italian', 'Pasta', 'Quick'],
-              source: 'external',
-              externalId: '1',
-              externalSource: 'Spoonacular',
-              rating: 4.5,
-              isSaved: true
-            },
-            {
-              id: 'external-2',
-              title: 'Chicken Tikka Masala',
-              description: 'Creamy and flavorful Indian curry with tender chicken',
-              image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop',
-              cookingTime: 45,
-              servings: 6,
-              difficulty: 'Medium',
-              tags: ['Indian', 'Curry', 'Spicy'],
-              source: 'external',
-              externalId: '2',
-              externalSource: 'Spoonacular',
-              rating: 4.8,
-              isSaved: true
-            }
-          ]
-          setSavedRecipes(mockSavedRecipes)
+        // Fetch personal recipes
+        const personalResponse = await fetch('/api/recipes/personal')
+        if (personalResponse.ok) {
+          const personalData = await personalResponse.json()
+          setPersonalRecipes(personalData.recipes)
+        }
+
+        // Fetch saved recipes (external recipes)
+        const savedResponse = await fetch('/api/recipes/saved')
+        if (savedResponse.ok) {
+          const savedData = await savedResponse.json()
+
+          // Update saved recipes with proper saved state
+          const savedRecipesWithState = savedData.savedRecipes.map((recipe: any) => ({
+            ...recipe,
+            isSaved: true
+          }))
+
+          setSavedRecipes(savedRecipesWithState)
         }
       } catch (error) {
-        console.error('Failed to fetch saved recipes:', error)
+        console.error('Failed to fetch recipes:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchSavedRecipes()
+    fetchRecipes()
   }, [])
 
   const handleSaveRecipe = (recipe: Recipe) => {
@@ -77,6 +59,8 @@ export default function RecipesPage() {
     setIsModalOpen(true)
   }
 
+  const allRecipes = [...personalRecipes, ...savedRecipes]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
       <Navigation />
@@ -86,7 +70,7 @@ export default function RecipesPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 text-gray-800 dark:text-white">My Recipes</h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Your saved recipe collection
+            Your personal recipes and saved favorites
           </p>
         </div>
 
@@ -128,7 +112,7 @@ export default function RecipesPage() {
               <span>Loading your recipes...</span>
             </div>
           </div>
-        ) : savedRecipes.length === 0 ? (
+        ) : allRecipes.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Empty State */}
             <Card className="col-span-full text-center py-12 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700">
@@ -138,9 +122,9 @@ export default function RecipesPage() {
                     <Plus className="h-8 w-8 text-orange-500 dark:text-orange-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">No saved recipes yet</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">No recipes yet</h3>
                     <p className="text-gray-600 dark:text-gray-300">
-                      Save recipes from the explore page to see them here
+                      Create your first recipe or save some from the explore page
                     </p>
                   </div>
                   <div className="flex gap-3">
@@ -163,7 +147,7 @@ export default function RecipesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {savedRecipes.map((recipe) => (
+            {allRecipes.map((recipe) => (
               <RecipeCard
                 key={recipe.id}
                 recipe={recipe}

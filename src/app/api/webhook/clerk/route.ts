@@ -1,7 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Webhook } from "svix";
-import { headers } from "next/headers";
-import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server"
+import { Webhook } from "svix"
+import { headers } from "next/headers"
+import { db } from "@/lib/db"
+
+interface WebhookEvent {
+  data: {
+    id: string
+    email_addresses?: Array<{ email_address: string }>
+    first_name?: string
+    last_name?: string
+  }
+  type: string
+}
 
 export async function POST(request: NextRequest) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
@@ -24,13 +34,13 @@ export async function POST(request: NextRequest) {
   }
 
   // Get the body
-  const payload = await request.json();
-  const body = JSON.stringify(payload);
+  const payload = await request.text();
+  const body = payload;
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
 
-  let evt: any;
+  let evt: WebhookEvent;
 
   // Verify the payload with the headers
   try {
@@ -38,7 +48,7 @@ export async function POST(request: NextRequest) {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
-    });
+    }) as WebhookEvent;
   } catch (err) {
     console.error("Error verifying webhook:", err);
     return new Response("Error occured", {
@@ -71,7 +81,7 @@ export async function POST(request: NextRequest) {
       const user = await db.user.create({
         data: {
           clerkId: id,
-          email: email_addresses[0]?.email_address || "",
+          email: email_addresses?.[0]?.email_address || "",
           firstName: first_name || "",
           lastName: last_name || "",
         },
@@ -95,7 +105,7 @@ export async function POST(request: NextRequest) {
       const user = await db.user.update({
         where: { clerkId: id },
         data: {
-          email: email_addresses[0]?.email_address || "",
+          email: email_addresses?.[0]?.email_address || "",
           firstName: first_name || "",
           lastName: last_name || "",
         },
@@ -131,5 +141,5 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ message: "Webhook processed" });
+  return NextResponse.json({ message: "Webhook received" });
 }

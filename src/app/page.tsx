@@ -5,6 +5,57 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, BookOpen, Calendar, ShoppingCart, ChefHat, Search } from "lucide-react";
 import { Navigation } from "@/components/navigation";
+import { db } from "@/lib/db";
+
+async function getDashboardStats(userId: string) {
+  try {
+    // Get the user from the database
+    const user = await db.user.findUnique({
+      where: { clerkId: userId }
+    });
+
+    if (!user) {
+      return { savedRecipes: 0, mealPlans: 0, groceryLists: 0, ingredients: 0 };
+    }
+
+    // Get saved recipes count from the API
+    let savedRecipesCount = 0;
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/recipes/saved`, {
+        cache: 'no-store'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        savedRecipesCount = data.savedRecipes?.length || 0;
+      }
+    } catch (error) {
+      console.error('Error fetching saved recipes count:', error);
+    }
+
+    // Get other stats from database
+    const mealPlansCount = await db.mealPlan.count({
+      where: { userId: user.id, isActive: true }
+    });
+
+    const groceryListsCount = await db.groceryList.count({
+      where: { userId: user.id, isActive: true }
+    });
+
+    const ingredientsCount = await db.ingredient.count({
+      where: { isActive: true }
+    });
+
+    return {
+      savedRecipes: savedRecipesCount,
+      mealPlans: mealPlansCount,
+      groceryLists: groceryListsCount,
+      ingredients: ingredientsCount
+    };
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    return { savedRecipes: 0, mealPlans: 0, groceryLists: 0, ingredients: 0 };
+  }
+}
 
 export default async function Home() {
   const { userId } = await auth();
@@ -12,6 +63,8 @@ export default async function Home() {
   if (!userId) {
     redirect("/sign-in");
   }
+
+  const stats = await getDashboardStats(userId);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
@@ -35,7 +88,7 @@ export default async function Home() {
                 <BookOpen className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">2</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.savedRecipes}</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   Saved recipes
                 </p>
@@ -50,7 +103,7 @@ export default async function Home() {
                 <Calendar className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.mealPlans}</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   Active plans
                 </p>
@@ -65,7 +118,7 @@ export default async function Home() {
                 <ShoppingCart className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.groceryLists}</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   Active lists
                 </p>
@@ -80,7 +133,7 @@ export default async function Home() {
                 <ChefHat className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.ingredients}</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   In database
                 </p>
