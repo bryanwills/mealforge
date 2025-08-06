@@ -1,5 +1,19 @@
 import { NextRequest, NextResponse } from "next/server"
 import { recipeAPIService, mockExternalRecipes } from "@/lib/recipe-api"
+import { db } from "@/lib/db"
+import { auth } from "@clerk/nextjs/server"
+
+interface ExtendedIngredient {
+  name: string
+  amount: number
+  unit: string
+  original: string
+}
+
+interface RecipeStep {
+  number: number
+  step: string
+}
 
 export async function GET(
   request: NextRequest,
@@ -27,14 +41,14 @@ export async function GET(
             ...convertedRecipe,
             ingredients: externalRecipe.extendedIngredients?.map((ingredient: unknown, index: number) => ({
               id: index + 1,
-              name: (ingredient as { name: string }).name,
-              amount: (ingredient as { amount: number }).amount,
-              unit: (ingredient as { unit: string }).unit,
-              original: (ingredient as { original: string }).original
+              name: (ingredient as ExtendedIngredient).name,
+              amount: (ingredient as ExtendedIngredient).amount,
+              unit: (ingredient as ExtendedIngredient).unit,
+              original: (ingredient as ExtendedIngredient).original
             })) || [],
-            instructions: ((externalRecipe.analyzedInstructions as unknown[])?.[0] as { steps?: unknown[] })?.steps?.map((step: unknown) => ({
-              number: (step as { number: number }).number,
-              step: (step as { step: string }).step
+            instructions: (externalRecipe.analyzedInstructions as any)?.[0]?.steps?.map((step: RecipeStep) => ({
+              number: step.number,
+              step: step.step
             })) || []
           }
 
@@ -65,12 +79,87 @@ export async function GET(
         return NextResponse.json(detailedMockRecipe)
       }
     } else {
-      // For personal recipes, fetch from your database
-      // TODO: Implement personal recipe fetching from database
-      return NextResponse.json(
-        { error: 'Personal recipe fetching not implemented yet' },
-        { status: 501 }
-      )
+      // For personal recipes, fetch from database
+      const { userId } = await auth()
+
+      if (!userId) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
+
+      try {
+        // Get the user from the database
+        const user = await db.user.findUnique({
+          where: { clerkId: userId }
+        })
+
+        if (!user) {
+          return NextResponse.json(
+            { error: 'User not found' },
+            { status: 404 }
+          )
+        }
+
+        // Fetch the recipe with ingredients
+        const recipe = await db.recipe.findFirst({
+          where: {
+            id: recipeId,
+            userId: user.id
+          },
+          include: {
+            ingredients: {
+              include: {
+                ingredient: true
+              },
+              orderBy: {
+                order: 'asc'
+              }
+            }
+          }
+        })
+
+        if (!recipe) {
+          return NextResponse.json(
+            { error: 'Recipe not found' },
+            { status: 404 }
+          )
+        }
+
+        // Convert to the expected format
+        const convertedRecipe = {
+          id: recipe.id,
+          title: recipe.title,
+          description: recipe.description || '',
+          image: recipe.imageUrl || '',
+          cookingTime: (recipe.prepTime || 0) + (recipe.cookTime || 0),
+          servings: recipe.servings,
+          difficulty: recipe.difficulty || 'Medium',
+          tags: recipe.tags,
+          source: 'personal' as const,
+          rating: 0, // Personal recipes don't have ratings yet
+          ingredients: recipe.ingredients.map((ri, index) => ({
+            id: index + 1,
+            name: ri.ingredient.name,
+            amount: ri.quantity,
+            unit: ri.unit,
+            original: `${ri.quantity} ${ri.unit} ${ri.ingredient.name}${ri.notes ? ` (${ri.notes})` : ''}`
+          })),
+          instructions: recipe.instructions.map((instruction, index) => ({
+            number: index + 1,
+            step: instruction
+          }))
+        }
+
+        return NextResponse.json(convertedRecipe)
+      } catch (dbError) {
+        console.error('Database error:', dbError)
+        return NextResponse.json(
+          { error: 'Failed to fetch recipe from database' },
+          { status: 500 }
+        )
+      }
     }
 
     return NextResponse.json(

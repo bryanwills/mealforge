@@ -90,30 +90,14 @@ export default function RecipeDetailPage() {
           }
         } else {
           // For personal recipes, fetch from your database
-          // TODO: Implement personal recipe fetching
-          const mockPersonalRecipe: RecipeDetail = {
-            id: recipeId,
-            title: "My Personal Recipe",
-            description: "This is a personal recipe created by you.",
-            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
-            cookingTime: 45,
-            servings: 6,
-            difficulty: "Medium",
-            tags: ["Personal", "Dinner"],
-            source: "personal",
-            rating: 4.8,
-            ingredients: [
-              { id: 1, name: "Chicken breast", amount: 500, unit: "g", original: "500g chicken breast" },
-              { id: 2, name: "Onion", amount: 1, unit: "medium", original: "1 medium onion, diced" },
-              { id: 3, name: "Garlic", amount: 3, unit: "cloves", original: "3 cloves garlic, minced" }
-            ],
-            instructions: [
-              { number: 1, step: "Season chicken with salt and pepper." },
-              { number: 2, step: "Cook chicken in a large skillet until golden brown." },
-              { number: 3, step: "Add onions and garlic, cook until softened." }
-            ]
+          const response = await fetch(`/api/recipes/${recipeId}`)
+          if (response.ok) {
+            const data = await response.json()
+            setRecipe(data)
+          } else {
+            console.error('Failed to fetch personal recipe')
+            // Handle error appropriately
           }
-          setRecipe(mockPersonalRecipe)
         }
       } catch (error) {
         console.error("Failed to fetch recipe:", error)

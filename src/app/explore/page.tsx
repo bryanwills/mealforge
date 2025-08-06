@@ -31,10 +31,24 @@ export default function ExplorePage() {
       const response = await fetch(`/api/recipes/search?${params}`)
       const data = await response.json()
 
+      // Check which recipes are saved
+      const savedResponse = await fetch('/api/recipes/saved')
+      let savedRecipeIds: string[] = []
+      if (savedResponse.ok) {
+        const savedData = await savedResponse.json()
+        savedRecipeIds = savedData.savedRecipes.map((recipe: any) => recipe.id)
+      }
+
+      // Update recipes with saved state
+      const recipesWithSavedState = data.results.map((recipe: any) => ({
+        ...recipe,
+        isSaved: savedRecipeIds.includes(recipe.id)
+      }))
+
       if (searchParams.offset === "0" || !searchParams.offset) {
-        setRecipes(data.results)
+        setRecipes(recipesWithSavedState)
       } else {
-        setRecipes(prev => [...prev, ...data.results])
+        setRecipes(prev => [...prev, ...recipesWithSavedState])
       }
 
       setHasMore(data.results.length === 12)
@@ -94,8 +108,14 @@ export default function ExplorePage() {
   }
 
   const handleSaveRecipe = (recipe: Recipe) => {
-    // TODO: Implement save to user's collection
-    console.log("Saving recipe:", recipe.title)
+    // The RecipeCard component handles the actual saving via API
+    // This function is called after successful save/unsave
+    console.log("Recipe saved/unsaved:", recipe.title)
+
+    // Update the recipe's saved state in the current list
+    setRecipes(prev => prev.map(r =>
+      r.id === recipe.id ? { ...r, isSaved: !r.isSaved } : r
+    ))
   }
 
   const handleViewRecipe = (recipe: Recipe) => {

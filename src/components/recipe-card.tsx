@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -35,6 +35,11 @@ interface RecipeCardProps {
 export function RecipeCard({ recipe, onSave, onView, showSourceIndicator = true }: RecipeCardProps) {
   const [isSaved, setIsSaved] = useState(recipe.isSaved || false)
 
+  // Update the saved state when the recipe prop changes
+  useEffect(() => {
+    setIsSaved(recipe.isSaved || false)
+  }, [recipe.isSaved])
+
   const handleSave = async () => {
     try {
       const action = isSaved ? 'unsave' : 'save'
@@ -45,7 +50,16 @@ export function RecipeCard({ recipe, onSave, onView, showSourceIndicator = true 
         },
         body: JSON.stringify({
           recipeId: recipe.id,
-          action
+          action,
+          title: recipe.title,
+          description: recipe.description,
+          imageUrl: recipe.image,
+          source: recipe.source,
+          externalSource: recipe.externalSource,
+          cookingTime: recipe.cookingTime,
+          servings: recipe.servings,
+          tags: recipe.tags,
+          rating: recipe.rating
         })
       })
 
