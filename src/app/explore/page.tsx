@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Search, Filter, Grid, List, Loader2, ChefHat } from "lucide-react"
+import { Search, Filter, Grid, Loader2, ChefHat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -36,11 +36,11 @@ export default function ExplorePage() {
       let savedRecipeIds: string[] = []
       if (savedResponse.ok) {
         const savedData = await savedResponse.json()
-        savedRecipeIds = savedData.savedRecipes.map((recipe: any) => recipe.id)
+        savedRecipeIds = savedData.savedRecipes.map((recipe: { id: string }) => recipe.id)
       }
 
       // Update recipes with saved state
-      const recipesWithSavedState = data.results.map((recipe: any) => ({
+      const recipesWithSavedState = data.results.map((recipe: Recipe) => ({
         ...recipe,
         isSaved: savedRecipeIds.includes(recipe.id)
       }))

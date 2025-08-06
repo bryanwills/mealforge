@@ -58,7 +58,7 @@ export function saveSavedRecipes(savedRecipes: Map<string, Set<string>>): void {
 }
 
 // Load saved recipes data from file
-export function loadSavedRecipesData(): Map<string, Map<string, any>> {
+export function loadSavedRecipesData(): Map<string, Map<string, Record<string, unknown>>> {
   try {
     ensureDataDir()
     const dataFile = SAVED_RECIPES_FILE.replace('.json', '-data.json')
@@ -74,7 +74,7 @@ export function loadSavedRecipesData(): Map<string, Map<string, any>> {
     const result = new Map()
     for (const [userId, recipes] of Object.entries(parsed)) {
       const userRecipes = new Map()
-      for (const [recipeId, recipeData] of Object.entries(recipes as Record<string, any>)) {
+      for (const [recipeId, recipeData] of Object.entries(recipes as Record<string, Record<string, unknown>>)) {
         userRecipes.set(recipeId, recipeData)
       }
       result.set(userId, userRecipes)
@@ -88,13 +88,13 @@ export function loadSavedRecipesData(): Map<string, Map<string, any>> {
 }
 
 // Save recipes data to file
-export function saveSavedRecipesData(savedRecipesData: Map<string, Map<string, any>>): void {
+export function saveSavedRecipesData(savedRecipesData: Map<string, Map<string, Record<string, unknown>>>): void {
   try {
     ensureDataDir()
     const dataFile = SAVED_RECIPES_FILE.replace('.json', '-data.json')
 
     // Convert nested Maps to plain objects for JSON serialization
-    const data: Record<string, Record<string, any>> = {}
+    const data: Record<string, Record<string, Record<string, unknown>>> = {}
     for (const [userId, recipes] of savedRecipesData.entries()) {
       data[userId] = {}
       for (const [recipeId, recipeData] of recipes.entries()) {

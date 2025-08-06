@@ -17,9 +17,9 @@ export interface ExternalRecipe {
   dishTypes: string[]
   diets: string[]
   instructions: string
-  analyzedInstructions: unknown[]
-  extendedIngredients: unknown[]
-  nutrition: unknown
+  analyzedInstructions: Array<Record<string, unknown>>
+  extendedIngredients: Array<Record<string, unknown>>
+  nutrition: Record<string, unknown>
   pricePerServing: number
   spoonacularScore: number
   healthScore: number
@@ -113,7 +113,7 @@ class RecipeAPIService {
     return this.makeRequest('/random', defaultParams)
   }
 
-  async getRecipeByIngredients(ingredients: string[], params: { ranking?: number; ignorePantry?: boolean; number?: number } = {}): Promise<unknown[]> {
+  async getRecipeByIngredients(ingredients: string[], params: { ranking?: number; ignorePantry?: boolean; number?: number } = {}): Promise<Array<Record<string, unknown>>> {
     const defaultParams = {
       ranking: 2,
       ignorePantry: true,

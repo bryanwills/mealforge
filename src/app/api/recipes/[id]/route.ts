@@ -46,7 +46,7 @@ export async function GET(
               unit: (ingredient as ExtendedIngredient).unit,
               original: (ingredient as ExtendedIngredient).original
             })) || [],
-            instructions: (externalRecipe.analyzedInstructions as any)?.[0]?.steps?.map((step: RecipeStep) => ({
+            instructions: (externalRecipe.analyzedInstructions as Array<{ steps: RecipeStep[] }>)?.[0]?.steps?.map((step: RecipeStep) => ({
               number: step.number,
               step: step.step
             })) || []

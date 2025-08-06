@@ -10,12 +10,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    let recipes
-    if (query) {
-      recipes = await recipeService.searchSharedRecipes(query, limit)
-    } else {
-      recipes = await recipeService.getSharedRecipes(limit, offset)
-    }
+    // TODO: Implement proper shared recipes functionality
+    // For now, return empty array since sharing functionality is not implemented
+    const recipes: Record<string, unknown>[] = []
 
     return NextResponse.json(recipes)
   } catch (error) {

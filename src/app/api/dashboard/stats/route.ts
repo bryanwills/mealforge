@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { db } from "@/lib/db"
 import { loadSavedRecipes } from "@/lib/saved-recipes-persistence"
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth()
 
@@ -63,6 +63,6 @@ export async function GET(request: NextRequest) {
 
 // Function to update saved recipes count (called from saved recipes API)
 // This is now handled by the file-based storage in saved-recipes-persistence
-export function updateSavedRecipesCount(userId: string, count: number) {
+function updateSavedRecipesCount(userId: string, count: number) {
   console.log(`Saved recipes count updated for user ${userId}: ${count}`)
 }

@@ -80,7 +80,7 @@ export default function RecipesPage() {
       difficulty: dbRecipe.difficulty || 'Medium',
       tags: dbRecipe.tags,
       rating: 4.5, // TODO: Implement rating system
-      source: dbRecipe.importSource ? 'external' as const : 'personal' as const,
+      source: dbRecipe.importSource ? ('external' as const) : ('personal' as const),
       isSaved: true, // All recipes on this page are saved by definition
       externalSource: dbRecipe.importSource
     }

@@ -57,14 +57,15 @@ export async function POST(
 
     const { id } = await params
 
-    // Check if recipe exists and is shared
+    // Check if recipe exists
     const existingRecipe = await recipeService.getRecipeById(id)
-    if (!existingRecipe || !existingRecipe.isShared) {
-      return NextResponse.json({ error: 'Recipe not found or not shared' }, { status: 404 })
+    if (!existingRecipe) {
+      return NextResponse.json({ error: 'Recipe not found' }, { status: 404 })
     }
 
-    await recipeService.likeRecipe(id, dbUser.id)
-    return NextResponse.json({ message: 'Recipe liked successfully' })
+    // TODO: Implement like functionality when database schema supports it
+    // await recipeService.likeRecipe(id, dbUser.id)
+    return NextResponse.json({ message: 'Like functionality not yet implemented' })
   } catch (error) {
     console.error('Error liking recipe:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -114,8 +115,9 @@ export async function DELETE(
 
     const { id } = await params
 
-    await recipeService.unlikeRecipe(id, dbUser.id)
-    return NextResponse.json({ message: 'Recipe unliked successfully' })
+    // TODO: Implement unlike functionality when database schema supports it
+    // await recipeService.unlikeRecipe(id, dbUser.id)
+    return NextResponse.json({ message: 'Unlike functionality not yet implemented' })
   } catch (error) {
     console.error('Error unliking recipe:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

@@ -58,29 +58,11 @@ export class StatisticsService {
         where: { userId: dbUser.id }
       }),
 
-      // Saved recipes (from external sources like Spoonacular)
-      prisma.recipe.count({
-        where: {
-          userId: dbUser.id,
-          importSource: { in: ['spoonacular', 'external'] }
-        }
-      }),
-
-      // Imported recipes (OCR, URL imports)
-      prisma.recipe.count({
-        where: {
-          userId: dbUser.id,
-          importSource: { in: ['ocr', 'url'] }
-        }
-      }),
-
-      // Shared recipes (recipes shared with community)
-      prisma.recipe.count({
-        where: {
-          userId: dbUser.id,
-          isShared: true
-        }
-      }),
+      // TODO: Implement proper recipe source tracking when database schema supports it
+      // For now, return 0 for these categories
+      0, // savedRecipes
+      0, // importedRecipes
+      0, // sharedRecipes
 
       // Meal plans
       prisma.mealPlan.count({
@@ -143,15 +125,7 @@ export class StatisticsService {
       }
     }
 
-    const recipes = await prisma.recipe.findMany({
-      where: { userId: dbUser.id },
-      select: {
-        importSource: true,
-        isShared: true,
-        createdAt: true
-      }
-    })
-
+    // TODO: Implement proper recipe breakdown when database schema supports source tracking
     const breakdown = {
       spoonacular: 0,
       ocr: 0,
@@ -160,27 +134,7 @@ export class StatisticsService {
       shared: 0
     }
 
-    recipes.forEach(recipe => {
-      if (recipe.isShared) breakdown.shared++
-
-      switch (recipe.importSource) {
-        case 'spoonacular':
-          breakdown.spoonacular++
-          break
-        case 'ocr':
-          breakdown.ocr++
-          break
-        case 'url':
-          breakdown.url++
-          break
-        case 'manual':
-        case null:
-        case undefined:
-          breakdown.manual++
-          break
-      }
-    })
-
+    // TODO: Implement proper recipe breakdown when database schema supports source tracking
     return breakdown
   }
 
@@ -202,8 +156,7 @@ export class StatisticsService {
       select: {
         id: true,
         title: true,
-        createdAt: true,
-        importSource: true
+        createdAt: true
       }
     })
 

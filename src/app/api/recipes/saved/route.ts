@@ -7,7 +7,7 @@ import { logger } from "@/lib/logger"
 const recipeService = new RecipeService()
 const dataService = new DataPersistenceService()
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const { userId } = await auth()
 
