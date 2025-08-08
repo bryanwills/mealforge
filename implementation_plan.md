@@ -225,3 +225,5 @@ const PRINT_URL_PATTERNS: PrintURLPatterns[] = [
 - **Meal Planning**: Suggest recipes based on ingredients
 - **Social Sharing**: Share imported recipes
 - **Recipe Rating**: Rate imported recipe accuracy
+- **Pantry Recipe Suggestions**: Suggest recipes based on pantry ingredients
+- **Restaurant Roulette**: Suggest a restaurant based on dietary preferences and recipes made
