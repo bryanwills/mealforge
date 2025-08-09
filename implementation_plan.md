@@ -227,4 +227,4 @@ const PRINT_URL_PATTERNS: PrintURLPatterns[] = [
 - **Recipe Rating**: Rate imported recipe accuracy
 - **Pantry Recipe Suggestions**: Suggest recipes based on pantry ingredients
 - **Popular Ingredients**: Suggest recipes based on popular ingredients used in app.
-- **Restaurant Roulette**: Suggest a restaurant based on dietary preferences and recipes made
+- **Restaurant Roulette**: Suggest a restaurant based on dietary preferences and recipes made in app.
