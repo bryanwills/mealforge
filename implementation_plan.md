@@ -228,3 +228,4 @@ const PRINT_URL_PATTERNS: PrintURLPatterns[] = [
 - **Pantry Recipe Suggestions**: Suggest recipes based on pantry ingredients
 - **Popular Ingredients**: Suggest recipes based on popular ingredients used in app.
 - **Restaurant Roulette**: Suggest a restaurant based on dietary preferences and recipes made in app.
+- **Feature Requests**: Allow users to request new features.
