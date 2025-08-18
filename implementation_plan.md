@@ -229,3 +229,4 @@ const PRINT_URL_PATTERNS: PrintURLPatterns[] = [
 - **Popular Ingredients**: Suggest recipes based on popular ingredients used in app.
 - **Restaurant Roulette**: Suggest a restaurant based on dietary preferences and recipes made in app.
 - **Feature Requests**: Allow users to request new features.
+- **Ingredient Improv**: Improv ingredients i.e. make powdered sugar from granulated sugar and a food processor.
