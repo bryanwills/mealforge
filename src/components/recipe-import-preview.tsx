@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { X, Plus, Save, XCircle } from "lucide-react"
 import { Navigation } from "@/components/navigation"
-import { ImportedRecipeData } from "@/lib/url-import-service"
+import { ScrapedRecipeData } from "@/lib/url-import-service";
 
 interface RecipeImportPreviewProps {
-  recipe: ImportedRecipeData
+  recipe: ScrapedRecipeData
   onSave: () => void
   onCancel: () => void
   isProcessing: boolean
@@ -32,10 +32,10 @@ export function RecipeImportPreview({
     instructions: recipe.instructions || []
   }
 
-  const [editingRecipe, setEditingRecipe] = useState<ImportedRecipeData>(safeRecipe)
+  const [editingRecipe, setEditingRecipe] = useState<ScrapedRecipeData>(safeRecipe)
   const [newTag, setNewTag] = useState('')
 
-  const updateField = (field: keyof ImportedRecipeData, value: unknown) => {
+  const updateField = (field: keyof ScrapedRecipeData, value: unknown) => {
     console.log('Updating field:', field, 'with value:', value)
     setEditingRecipe(prev => ({
       ...prev,

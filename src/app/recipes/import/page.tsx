@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Upload, Link as LinkIcon, Camera, FileText, Loader2, AlertCircle, CheckCircle, Image as ImageIcon, X } from "lucide-react";
 import Link from "next/link";
 import { RecipeImportPreview } from "@/components/recipe-import-preview";
-import { ImportedRecipeData } from "@/lib/url-import-service";
+import { ScrapedRecipeData } from "@/lib/url-import-service";
 import { useRouter } from "next/navigation";
 
 interface ImportProgress {
@@ -38,7 +38,7 @@ export default function ImportRecipePage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [url, setUrl] = useState('');
-  const [extractedRecipe, setExtractedRecipe] = useState<ImportedRecipeData | null>(null);
+  const [extractedRecipe, setExtractedRecipe] = useState<ScrapedRecipeData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);

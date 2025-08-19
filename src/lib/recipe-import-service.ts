@@ -1,4 +1,4 @@
-import { URLImportService, ImportedRecipeData, ImportResult } from './url-import-service'
+import { URLImportService, ScrapedRecipeData } from './url-import-service'
 import { logger } from './logger'
 
 export interface ExtractedRecipe {
@@ -30,30 +30,45 @@ export interface RecipeData {
   isShared: boolean
 }
 
+export interface ImportResult {
+  recipe: ScrapedRecipeData
+  validation: { isValid: boolean; issues: string[] }
+}
+
 export class RecipeImportService {
   static async importFromURL(url: string): Promise<ImportResult> {
     logger.info('RecipeImportService: Starting URL import', { url })
     try {
-      const result = await URLImportService.importFromURL(url)
+      const result = await URLImportService.scrapeRecipeFromURL(url)
+
+      // Convert ScrapedRecipeData to ImportResult format
+      const importResult: ImportResult = {
+        recipe: result,
+        validation: {
+          isValid: result.ingredients.length > 0 && result.instructions.length > 0,
+          issues: []
+        }
+      }
+
       logger.info('RecipeImportService: URL import completed', {
-        title: result.recipe.title,
-        ingredientCount: result.recipe.ingredients.length,
-        validationIssues: result.validation.issues.length
+        title: result.title,
+        ingredientCount: result.ingredients.length,
+        validationIssues: importResult.validation.issues.length
       })
-      return result
+      return importResult
     } catch (error) {
       logger.error('RecipeImportService: Error importing from URL', { url, error })
       throw error
     }
   }
 
-  static async importFromImage(imageFile: File): Promise<ImportedRecipeData> {
+  static async importFromImage(imageFile: File): Promise<ScrapedRecipeData> {
     logger.info('RecipeImportService: Starting image import', { fileName: imageFile.name })
 
     // Mock OCR processing
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    const mockRecipe: ImportedRecipeData = {
+    const mockRecipe: ScrapedRecipeData = {
       title: "Extracted Recipe",
       description: "Recipe extracted from uploaded image. Please review and edit as needed.",
       sourceUrl: "",
@@ -102,26 +117,26 @@ export class RecipeImportService {
     return mockRecipe
   }
 
-  static convertExtractedRecipeToDatabaseFormat(recipe: ImportedRecipeData): RecipeData {
+  static convertToRecipeData(scrapedData: ScrapedRecipeData): RecipeData {
     return {
-      title: recipe.title,
-      description: recipe.description,
-      sourceUrl: recipe.sourceUrl,
-      prepTime: recipe.prepTime || 0,
-      cookTime: recipe.cookTime || 0,
-      servings: recipe.servings || 1,
-      difficulty: recipe.difficulty || "medium",
-      cuisine: recipe.cuisine || "American",
-      tags: recipe.tags,
-      instructions: recipe.instructions,
-      ingredients: recipe.ingredients.map(ing => ({
+      title: scrapedData.title,
+      description: scrapedData.description,
+      sourceUrl: scrapedData.sourceUrl,
+      prepTime: scrapedData.prepTime || 0,
+      cookTime: scrapedData.cookTime || 0,
+      servings: scrapedData.servings || 0,
+      difficulty: scrapedData.difficulty || 'medium',
+      cuisine: scrapedData.cuisine || 'Unknown',
+      tags: scrapedData.tags,
+      instructions: scrapedData.instructions,
+      ingredients: scrapedData.ingredients.map((ing: { quantity: number; unit: string; name: string; notes?: string }) => ({
         quantity: ing.quantity,
         unit: ing.unit,
         name: ing.name,
-        notes: ing.notes || ""
+        notes: ing.notes || ''
       })),
-      isPublic: recipe.isPublic,
-      isShared: recipe.isShared
+      isPublic: scrapedData.isPublic,
+      isShared: scrapedData.isShared
     }
   }
 }
