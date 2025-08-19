@@ -1,4 +1,4 @@
-import { URLImportService, ScrapedRecipeData } from './url-import-service'
+import { URLImportService, ImportedRecipeData, ImportResult } from './url-import-service'
 import { logger } from './logger'
 
 export interface ExtractedRecipe {
@@ -30,45 +30,34 @@ export interface RecipeData {
   isShared: boolean
 }
 
-export interface ImportResult {
-  recipe: ScrapedRecipeData
-  validation: { isValid: boolean; issues: string[] }
-}
-
 export class RecipeImportService {
   static async importFromURL(url: string): Promise<ImportResult> {
     logger.info('RecipeImportService: Starting URL import', { url })
     try {
-      const result = await URLImportService.scrapeRecipeFromURL(url)
-
-      // Convert ScrapedRecipeData to ImportResult format
-      const importResult: ImportResult = {
-        recipe: result,
-        validation: {
-          isValid: result.ingredients.length > 0 && result.instructions.length > 0,
-          issues: []
-        }
-      }
+      const result = await URLImportService.importFromURL(url)
 
       logger.info('RecipeImportService: URL import completed', {
-        title: result.title,
-        ingredientCount: result.ingredients.length,
-        validationIssues: importResult.validation.issues.length
+        title: result.recipe.title,
+        ingredientCount: result.recipe.ingredients.length,
+        extractionMethod: result.extractionMethod,
+        confidence: result.confidence,
+        validationIssues: result.validation.issues.length
       })
-      return importResult
+
+      return result
     } catch (error) {
       logger.error('RecipeImportService: Error importing from URL', { url, error })
       throw error
     }
   }
 
-  static async importFromImage(imageFile: File): Promise<ScrapedRecipeData> {
+  static async importFromImage(imageFile: File): Promise<ImportedRecipeData> {
     logger.info('RecipeImportService: Starting image import', { fileName: imageFile.name })
 
     // Mock OCR processing
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    const mockRecipe: ScrapedRecipeData = {
+    const mockRecipe: ImportedRecipeData = {
       title: "Extracted Recipe",
       description: "Recipe extracted from uploaded image. Please review and edit as needed.",
       sourceUrl: "",
@@ -117,7 +106,7 @@ export class RecipeImportService {
     return mockRecipe
   }
 
-  static convertToRecipeData(scrapedData: ScrapedRecipeData): RecipeData {
+  static convertToRecipeData(scrapedData: ImportedRecipeData): RecipeData {
     return {
       title: scrapedData.title,
       description: scrapedData.description,

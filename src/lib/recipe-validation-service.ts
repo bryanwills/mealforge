@@ -1,4 +1,4 @@
-import { ScrapedRecipeData } from './url-import-service'
+import { ImportedRecipeData } from './url-import-service'
 import { logger } from './logger'
 
 export interface ValidationResult {
@@ -16,7 +16,7 @@ export interface ValidationIssue {
 }
 
 export class RecipeValidationService {
-  private static butterfingerExpectedData: ScrapedRecipeData = {
+  private static butterfingerExpectedData: ImportedRecipeData = {
     title: "Butterfinger Bars",
     description: "Everyone will want to 'lay a finger' on these Butterfinger Bars! They are too good not to share, and you will prefer these bars to the candy bar.\n\nOriginal recipe available at https://iambaker.net/butterfinger-bars/",
     sourceUrl: "https://iambaker.net/butterfinger-bars/",
@@ -92,7 +92,7 @@ export class RecipeValidationService {
     isShared: false
   }
 
-  static validateExtractedRecipe(extractedData: ScrapedRecipeData, url: string): ValidationResult {
+  static validateExtractedRecipe(extractedData: ImportedRecipeData, url: string): ValidationResult {
     const issues: ValidationIssue[] = []
     const suggestions: string[] = []
 
@@ -107,7 +107,7 @@ export class RecipeValidationService {
     return this.validateGenericRecipe(extractedData)
   }
 
-  private static validateAgainstButterfinger(extractedData: ScrapedRecipeData): ValidationResult {
+  private static validateAgainstButterfinger(extractedData: ImportedRecipeData): ValidationResult {
     const issues: ValidationIssue[] = []
     const suggestions: string[] = []
     const expected = this.butterfingerExpectedData
@@ -221,7 +221,7 @@ export class RecipeValidationService {
     }
   }
 
-  private static validateGenericRecipe(extractedData: ScrapedRecipeData): ValidationResult {
+  private static validateGenericRecipe(extractedData: ImportedRecipeData): ValidationResult {
     const issues: ValidationIssue[] = []
     const suggestions: string[] = []
 
