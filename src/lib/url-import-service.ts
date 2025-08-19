@@ -3,6 +3,8 @@ import { IngredientParser } from './ingredient-parser'
 import { RecipeValidationService, ValidationResult } from './recipe-validation-service'
 import { ProfessionalAPIService, APIResult } from './professional-api-service'
 import { AIParsingService, AIParsingResult } from './ai-parsing-service'
+import { HeadlessBrowserService, BrowserScrapingResult } from './headless-browser-service'
+import { MultiSourceAggregationService, AggregatedRecipeResult } from './multi-source-aggregation-service'
 
 export interface ImportedRecipeData {
   title: string
@@ -29,10 +31,12 @@ export interface ImportedRecipeData {
 export interface ImportResult {
   recipe: ImportedRecipeData
   validation: ValidationResult
-  extractionMethod: 'html-scraping' | 'professional-api' | 'ai-parsing' | 'fallback'
+  extractionMethod: 'html-scraping' | 'professional-api' | 'ai-parsing' | 'browser-scraping' | 'multi-source-aggregation' | 'fallback'
   confidence: number
   apiResults?: APIResult[]
   aiResults?: AIParsingResult[]
+  browserResults?: BrowserScrapingResult[]
+  aggregatedResult?: AggregatedRecipeResult
 }
 
 interface PrintURLPattern {
@@ -366,10 +370,12 @@ export class URLImportService {
 
       // Phase 1: Try HTML scraping first (highest accuracy, lowest cost)
       let recipeData: ImportedRecipeData | null = null
-      let extractionMethod: 'html-scraping' | 'professional-api' | 'ai-parsing' | 'fallback' = 'html-scraping'
+      let extractionMethod: 'html-scraping' | 'professional-api' | 'ai-parsing' | 'browser-scraping' | 'multi-source-aggregation' | 'fallback' = 'html-scraping'
       let confidence = 0.6 // Base confidence for HTML scraping
       let apiResults: APIResult[] | undefined
       let aiResults: AIParsingResult[] | undefined
+      let browserResults: BrowserScrapingResult[] | undefined
+      let aggregatedResult: AggregatedRecipeResult | undefined
 
       try {
         const htmlContent = await this.fetchHTMLContent(bestUrl)
@@ -442,28 +448,78 @@ export class URLImportService {
               throw new Error('All AI parsing services failed')
             }
           } catch (aiError) {
-            logger.warn('AI parsing failed, using fallback', {
+            logger.warn('AI parsing failed, falling back to browser scraping', {
               url: bestUrl,
               error: aiError instanceof Error ? aiError.message : 'Unknown error'
             })
 
-            // Phase 4: Fallback to basic recipe with URL title
-            extractionMethod = 'fallback'
-            confidence = 0.3
-            recipeData = {
-              title: this.extractTitleFromURL(bestUrl),
-              description: `Failed to extract recipe from ${bestUrl}. Using basic fallback data.`,
-              sourceUrl: cleanUrl,
-              prepTime: 0,
-              cookTime: 0,
-              servings: 0,
-              difficulty: "medium",
-              cuisine: "Unknown",
-              tags: ["imported", "url", "fallback"],
-              instructions: ["Recipe extraction failed. Please check the original source and edit manually."],
-              ingredients: [],
-              isPublic: false,
-              isShared: false
+            // Phase 4: Fallback to browser scraping
+            try {
+              browserResults = await HeadlessBrowserService.scrapeRecipeWithBrowser(bestUrl)
+              const bestBrowserResult = HeadlessBrowserService.getBestBrowserResult(browserResults)
+
+              if (bestBrowserResult && bestBrowserResult.data) {
+                recipeData = bestBrowserResult.data
+                extractionMethod = 'browser-scraping'
+                confidence = bestBrowserResult.confidence
+
+                logger.info('Browser scraping successful', {
+                  url: bestUrl,
+                  method: bestBrowserResult.method,
+                  confidence: bestBrowserResult.confidence
+                })
+              } else {
+                throw new Error('All browser scraping services failed')
+              }
+            } catch (browserError) {
+              logger.warn('Browser scraping failed, falling back to multi-source aggregation', {
+                url: bestUrl,
+                error: browserError instanceof Error ? browserError.message : 'Unknown error'
+              })
+
+              // Phase 5: Fallback to multi-source aggregation
+              try {
+                const aggregatedResults = await MultiSourceAggregationService.aggregateRecipeWithMultiSources(bestUrl)
+                const bestAggregatedResult = MultiSourceAggregationService.getBestAggregatedResult(aggregatedResults)
+
+                if (bestAggregatedResult && bestAggregatedResult.data) {
+                  recipeData = bestAggregatedResult.data
+                  extractionMethod = 'multi-source-aggregation'
+                  confidence = bestAggregatedResult.confidence
+
+                  logger.info('Multi-source aggregation successful', {
+                    url: bestUrl,
+                    confidence: bestAggregatedResult.confidence,
+                    totalCost: bestAggregatedResult.totalCost
+                  })
+                } else {
+                  throw new Error('All multi-source aggregation services failed')
+                }
+              } catch (aggregatedError) {
+                logger.warn('Multi-source aggregation failed, using fallback', {
+                  url: bestUrl,
+                  error: aggregatedError instanceof Error ? aggregatedError.message : 'Unknown error'
+                })
+
+                // Phase 6: Fallback to basic recipe with URL title
+                extractionMethod = 'fallback'
+                confidence = 0.3
+                recipeData = {
+                  title: this.extractTitleFromURL(bestUrl),
+                  description: `Failed to extract recipe from ${bestUrl}. Using basic fallback data.`,
+                  sourceUrl: cleanUrl,
+                  prepTime: 0,
+                  cookTime: 0,
+                  servings: 0,
+                  difficulty: "medium",
+                  cuisine: "Unknown",
+                  tags: ["imported", "url", "fallback"],
+                  instructions: ["Recipe extraction failed. Please check the original source and edit manually."],
+                  ingredients: [],
+                  isPublic: false,
+                  isShared: false
+                }
+              }
             }
           }
         }
@@ -480,14 +536,10 @@ export class URLImportService {
       // Validate the extracted recipe
       const validation = RecipeValidationService.validateExtractedRecipe(recipeData, url)
 
-      logger.info('URL import completed with fallback chain', {
+      logger.info('Recipe import completed', {
         url: cleanUrl,
-        title: recipeData.title,
-        ingredientCount: recipeData.ingredients.length,
-        instructionCount: recipeData.instructions.length,
-        extractionMethod,
+        method: extractionMethod,
         confidence,
-        validationIssues: validation.issues.length,
         isValid: validation.isValid,
         totalCost: apiResults ? apiResults.reduce((sum, r) => sum + r.cost, 0) : 0,
         aiCost: aiResults ? aiResults.reduce((sum, r) => sum + r.cost, 0) : 0
@@ -499,7 +551,9 @@ export class URLImportService {
         extractionMethod,
         confidence,
         apiResults,
-        aiResults
+        aiResults,
+        browserResults,
+        aggregatedResult
       }
     } catch (error) {
       logger.error('All URL import methods failed', { url, error })
@@ -529,7 +583,9 @@ export class URLImportService {
         extractionMethod: 'fallback',
         confidence: 0.1,
         apiResults: [],
-        aiResults: []
+        aiResults: [],
+        browserResults: [],
+        aggregatedResult: undefined
       }
     }
   }
