@@ -2,6 +2,7 @@ import { logger } from './logger'
 import { IngredientParser } from './ingredient-parser'
 import { RecipeValidationService, ValidationResult } from './recipe-validation-service'
 import { ProfessionalAPIService, APIResult } from './professional-api-service'
+import { AIParsingService, AIParsingResult } from './ai-parsing-service'
 
 export interface ImportedRecipeData {
   title: string
@@ -28,9 +29,10 @@ export interface ImportedRecipeData {
 export interface ImportResult {
   recipe: ImportedRecipeData
   validation: ValidationResult
-  extractionMethod: 'html-scraping' | 'professional-api' | 'fallback'
+  extractionMethod: 'html-scraping' | 'professional-api' | 'ai-parsing' | 'fallback'
   confidence: number
   apiResults?: APIResult[]
+  aiResults?: AIParsingResult[]
 }
 
 interface PrintURLPattern {
@@ -364,9 +366,10 @@ export class URLImportService {
 
       // Phase 1: Try HTML scraping first (highest accuracy, lowest cost)
       let recipeData: ImportedRecipeData | null = null
-      let extractionMethod: 'html-scraping' | 'professional-api' | 'fallback' = 'html-scraping'
+      let extractionMethod: 'html-scraping' | 'professional-api' | 'ai-parsing' | 'fallback' = 'html-scraping'
       let confidence = 0.6 // Base confidence for HTML scraping
       let apiResults: APIResult[] | undefined
+      let aiResults: AIParsingResult[] | undefined
 
       try {
         const htmlContent = await this.fetchHTMLContent(bestUrl)
@@ -414,28 +417,54 @@ export class URLImportService {
             throw new Error('All professional APIs failed')
           }
         } catch (apiError) {
-          logger.warn('Professional API extraction failed, using fallback', {
+          logger.warn('Professional API extraction failed, falling back to AI parsing', {
             url: bestUrl,
             error: apiError instanceof Error ? apiError.message : 'Unknown error'
           })
 
-          // Phase 3: Fallback to basic recipe with URL title
-          extractionMethod = 'fallback'
-          confidence = 0.3
-          recipeData = {
-            title: this.extractTitleFromURL(bestUrl),
-            description: `Failed to extract recipe from ${bestUrl}. Using basic fallback data.`,
-            sourceUrl: cleanUrl,
-            prepTime: 0,
-            cookTime: 0,
-            servings: 0,
-            difficulty: "medium",
-            cuisine: "Unknown",
-            tags: ["imported", "url", "fallback"],
-            instructions: ["Recipe extraction failed. Please check the original source and edit manually."],
-            ingredients: [],
-            isPublic: false,
-            isShared: false
+          // Phase 3: Fallback to AI parsing
+          try {
+            aiResults = await AIParsingService.parseRecipeWithAI(bestUrl)
+            const bestAIResult = AIParsingService.getBestAIResult(aiResults || [])
+
+            if (bestAIResult && bestAIResult.data) {
+              recipeData = bestAIResult.data
+              extractionMethod = 'ai-parsing'
+              confidence = bestAIResult.confidence
+
+              logger.info('AI parsing successful', {
+                url: bestUrl,
+                provider: bestAIResult.provider,
+                confidence: bestAIResult.confidence,
+                cost: bestAIResult.cost
+              })
+            } else {
+              throw new Error('All AI parsing services failed')
+            }
+          } catch (aiError) {
+            logger.warn('AI parsing failed, using fallback', {
+              url: bestUrl,
+              error: aiError instanceof Error ? aiError.message : 'Unknown error'
+            })
+
+            // Phase 4: Fallback to basic recipe with URL title
+            extractionMethod = 'fallback'
+            confidence = 0.3
+            recipeData = {
+              title: this.extractTitleFromURL(bestUrl),
+              description: `Failed to extract recipe from ${bestUrl}. Using basic fallback data.`,
+              sourceUrl: cleanUrl,
+              prepTime: 0,
+              cookTime: 0,
+              servings: 0,
+              difficulty: "medium",
+              cuisine: "Unknown",
+              tags: ["imported", "url", "fallback"],
+              instructions: ["Recipe extraction failed. Please check the original source and edit manually."],
+              ingredients: [],
+              isPublic: false,
+              isShared: false
+            }
           }
         }
       }
@@ -460,7 +489,8 @@ export class URLImportService {
         confidence,
         validationIssues: validation.issues.length,
         isValid: validation.isValid,
-        totalCost: apiResults ? apiResults.reduce((sum, r) => sum + r.cost, 0) : 0
+        totalCost: apiResults ? apiResults.reduce((sum, r) => sum + r.cost, 0) : 0,
+        aiCost: aiResults ? aiResults.reduce((sum, r) => sum + r.cost, 0) : 0
       })
 
       return {
@@ -468,7 +498,8 @@ export class URLImportService {
         validation,
         extractionMethod,
         confidence,
-        apiResults
+        apiResults,
+        aiResults
       }
     } catch (error) {
       logger.error('All URL import methods failed', { url, error })
@@ -497,7 +528,8 @@ export class URLImportService {
         validation,
         extractionMethod: 'fallback',
         confidence: 0.1,
-        apiResults: []
+        apiResults: [],
+        aiResults: []
       }
     }
   }
