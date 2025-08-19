@@ -11,178 +11,180 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  clerkId     String   @unique // Clerk user ID
-  email       String   @unique
-  firstName   String?
-  lastName    String?
-  preferences Json     @default("{}")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  recipes     Recipe[]
-  mealPlans   MealPlan[]
-  groceryLists GroceryList[]
-  savedRecipes SavedRecipe[]
-}
-
-model Recipe {
-  id           String   @id @default(uuid())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
-  title        String
-  description  String?
-  imageUrl     String?
-  prepTime     Int?     // in minutes
-  cookTime     Int?     // in minutes
-  servings     Int      @default(1)
-  difficulty   String?  // easy, medium, hard
-  cuisine      String?
-  tags         String[] // array of tags
-  instructions String[]
-  sourceUrl    String?  // URL where recipe was imported from
-  isPublic     Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  ingredients  RecipeIngredient[]
-  mealPlanItems MealPlanItem[]
-}
-
-model SavedRecipe {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  recipeId  String   // External recipe ID or personal recipe ID
-  source    String   // 'external' or 'personal'
-  title     String
-  description String?
-  imageUrl  String?
-  externalSource String? // For external recipes
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, recipeId, source])
-}
-
-model Ingredient {
-  id                    String   @id @default(uuid())
-  name                  String   @unique
-  category              String?  // e.g., "produce", "dairy", "pantry"
-  commonUnits           String[] // e.g., ["cup", "tbsp", "tsp", "g", "oz"]
-  caloriesPerGram       Float?
-  proteinPerGram        Float?
-  carbsPerGram          Float?
-  fatPerGram            Float?
-  fiberPerGram          Float?
-  sugarPerGram          Float?
-  sodiumPerGram         Float?
-  conversionFactors     Json?    // conversion factors to grams for different units
-  isActive              Boolean  @default(true)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
   // Relations
-  recipeIngredients     RecipeIngredient[]
-  substitutions         Substitution[] @relation("OriginalIngredient")
-  usedAsSubstitute      Substitution[] @relation("SubstituteIngredient")
-  groceryListItems      GroceryListItem[]
+  recipes        Recipe[]
+  savedRecipes  SavedRecipe[]
+  videoJobs     VideoProcessingJob[]
+  videoAnalyses VideoAnalysis[]
+  videoRecipes  VideoRecipe[]
+
+  @@map("users")
 }
 
-model RecipeIngredient {
-  id             String     @id @default(uuid())
-  recipe         Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  recipeId       String
-  ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId   String
-  unit           String
-  quantity       Float
-  notes          String?    // optional notes for this ingredient
-  isOptional     Boolean    @default(false)
-  order          Int        // for ordering ingredients in the recipe
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  @@unique([recipeId, ingredientId, unit])
-}
-
-model Substitution {
-  id             String     @id @default(uuid())
-  originalIngredient Ingredient @relation("OriginalIngredient", fields: [originalIngredientId], references: [id])
-  originalIngredientId String
-  substituteIngredient Ingredient @relation("SubstituteIngredient", fields: [substituteIngredientId], references: [id])
-  substituteIngredientId String
-  ratio          Float      // how much substitute to use for 1 unit of original
-  notes          String?    // notes about the substitution
-  isActive       Boolean    @default(true)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  @@unique([originalIngredientId, substituteIngredientId])
-}
-
-model MealPlan {
-  id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  name        String
+model Recipe {
+  id          String   @id @default(cuid())
+  title       String
   description String?
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(true)
+  imageUrl    String?
+  prepTime    Int      @default(0)
+  cookTime    Int      @default(0)
+  servings    Int      @default(0)
+  difficulty  String   @default("medium")
+  cuisine     String?
+  tags        String[]
+  instructions String[]
+  ingredients Json[] // Array of ingredient objects
+  sourceUrl   String?
+  isPublic    Boolean  @default(false)
+  isShared    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Relations
-  items       MealPlanItem[]
-}
-
-model MealPlanItem {
-  id          String   @id @default(uuid())
-  mealPlan    MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
-  mealPlanId  String
-  recipe      Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId    String
-  date        DateTime
-  mealType    String   // breakfast, lunch, dinner, snack
-  servings    Int      @default(1)
-  notes       String?
-  order       Int      // for ordering items within a day
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([mealPlanId, recipeId, date, mealType])
-}
-
-model GroceryList {
-  id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
-  name        String
-  description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
   // Relations
-  items       GroceryListItem[]
+  user        User         @relation(fields: [userId], references: [id])
+  savedRecipes SavedRecipe[]
+
+  @@map("recipes")
 }
 
-model GroceryListItem {
-  id            String      @id @default(uuid())
-  groceryList   GroceryList @relation(fields: [groceryListId], references: [id], onDelete: Cascade)
-  groceryListId String
-  ingredient    Ingredient  @relation(fields: [ingredientId], references: [id])
-  ingredientId  String
-  unit          String
-  quantity      Float
-  isChecked     Boolean     @default(false)
-  notes         String?
-  order         Int         // for ordering items in the list
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+model SavedRecipe {
+  id        String   @id @default(cuid())
+  recipeId  String
+  userId    String
+  createdAt DateTime @default(now())
 
-  @@unique([groceryListId, ingredientId, unit])
+  // Relations
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([recipeId, userId])
+  @@map("saved_recipes")
+}
+
+// Video Processing Models
+model VideoProcessingJob {
+  id        String   @id @default(cuid())
+  videoId   String   @unique
+  userId    String
+  platform  String
+  status    String   @default("queued") // queued, processing, completed, failed
+  priority  String   @default("normal") // low, normal, high
+  progress  Int      @default(0)
+  currentStep String @default("Queued for processing")
+  estimatedTime Int  @default(0)
+  error     String?
+  retryCount Int     @default(0)
+  maxRetries Int     @default(3)
+  createdAt DateTime @default(now())
+  startedAt DateTime?
+  completedAt DateTime?
+
+  // Relations
+  user          User           @relation(fields: [userId], references: [id])
+  videoAnalysis VideoAnalysis?
+  videoRecipe   VideoRecipe?
+
+  @@map("video_processing_jobs")
+}
+
+model VideoAnalysis {
+  id        String   @id @default(cuid())
+  jobId     String   @unique
+  videoId   String
+  analysisType String @default("full") // full, quick, custom
+  status    String   @default("queued") // queued, processing, completed, failed
+  progress  Int      @default(0)
+  currentStep String?
+  estimatedCompletion DateTime?
+  analysisConfig Json? // Analysis options and configuration
+  frames    Json? // Extracted video frames with objects and text
+  audioSegments Json? // Audio transcription segments
+  textOverlays Json? // OCR text overlays
+  motionAnalysis Json? // Motion and action analysis
+  confidence Float   @default(0)
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  videoJob VideoProcessingJob @relation(fields: [jobId], references: [id])
+
+  @@map("video_analyses")
+}
+
+model VideoRecipe {
+  id        String   @id @default(cuid())
+  jobId     String   @unique
+  videoId   String
+  userId    String
+  title     String
+  description String?
+  imageUrl  String?
+  prepTime  Int      @default(0)
+  cookTime  Int      @default(0)
+  servings  Int      @default(0)
+  difficulty String  @default("easy")
+  cuisine   String?
+  tags      String[]
+  instructions String[]
+  ingredients Json[] // Array of ingredient objects
+  sourceUrl String?
+  isPublic  Boolean  @default(false)
+  isShared  Boolean  @default(false)
+  confidence Float   @default(0)
+  extractionMethod String @default("ai-video-analysis")
+  recommendations Json? // AI-generated recommendations
+  metadata  Json? // Extraction metadata and options
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  videoJob VideoProcessingJob @relation(fields: [jobId], references: [id])
+  user     User               @relation(fields: [userId], references: [id])
+
+  @@map("video_recipes")
+}
+
+model VideoFile {
+  id        String   @id @default(cuid())
+  filename  String
+  originalName String
+  mimeType  String
+  size      Int
+  path      String
+  platform  String? // tiktok, instagram, youtube, facebook, custom
+  metadata  Json? // Video metadata (duration, resolution, etc.)
+  status    String  @default("uploaded") // uploaded, processing, completed, failed
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("video_files")
+}
+
+model VideoImportLog {
+  id        String   @id @default(cuid())
+  videoId   String
+  userId    String
+  action    String // upload, analyze, extract, save
+  status    String // success, failed
+  details   Json? // Action details and results
+  error     String?
+  processingTime Int? // Time taken in milliseconds
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("video_import_logs")
 }

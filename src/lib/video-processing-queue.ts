@@ -1,5 +1,6 @@
 import { logger } from './logger'
 import { VideoImportResult, VideoMetadata } from './video-import-service'
+import { VideoDatabaseService } from './video-database-service'
 
 export interface VideoProcessingJob {
   id: string
@@ -57,6 +58,7 @@ export class VideoProcessingQueue {
   async addJob(
     videoId: string,
     platform: string,
+    userId: string,
     options: {
       url?: string
       file?: File
@@ -82,110 +84,226 @@ export class VideoProcessingQueue {
       maxRetries: 3
     }
 
-    this.queue.push(job)
-    this.sortQueue()
+    try {
+      // Create job in database
+      await VideoDatabaseService.createVideoJob({
+        videoId,
+        userId,
+        platform,
+        priority: job.priority,
+        url: options.url,
+        file: options.file
+      })
 
-    logger.info('Video processing job added to queue', {
-      jobId,
-      videoId,
-      platform,
-      priority: job.priority,
-      queueLength: this.queue.length
-    })
+      // Add to in-memory queue
+      this.queue.push(job)
+      this.sortQueue()
 
-    // Start processing if not already running
-    if (!this.isProcessing) {
-      this.startProcessing()
+      logger.info('Video processing job added to queue', {
+        jobId,
+        videoId,
+        platform,
+        priority: job.priority,
+        queueLength: this.queue.length
+      })
+
+      // Start processing if not already running
+      if (!this.isProcessing) {
+        this.startProcessing()
+      }
+
+      return jobId
+    } catch (error) {
+      logger.error('Failed to create video processing job in database', { error, job })
+      throw error
     }
-
-    return jobId
   }
 
   /**
    * Get job status by ID
    */
-  getJobStatus(jobId: string): VideoProcessingJob | null {
-    const job = this.queue.find(j => j.id === jobId) ||
-                this.processing.find(j => j.id === jobId)
+  async getJobStatus(jobId: string): Promise<VideoProcessingJob | null> {
+    try {
+      // First check in-memory queue
+      const inMemoryJob = this.queue.find(j => j.id === jobId) ||
+                          this.processing.find(j => j.id === jobId)
 
-    return job || null
+      if (inMemoryJob) {
+        return inMemoryJob
+      }
+
+      // If not in memory, fetch from database
+      const dbJob = await VideoDatabaseService.getVideoJob(jobId)
+      if (dbJob) {
+        // Convert database job to in-memory format
+        const job: VideoProcessingJob = {
+          id: dbJob.id,
+          videoId: dbJob.videoId,
+          platform: dbJob.platform,
+          status: dbJob.status as 'queued' | 'processing' | 'completed' | 'failed',
+          priority: dbJob.priority as 'low' | 'normal' | 'high',
+          createdAt: dbJob.createdAt,
+          startedAt: dbJob.startedAt || undefined,
+          completedAt: dbJob.completedAt || undefined,
+          progress: dbJob.progress,
+          currentStep: dbJob.currentStep,
+          estimatedTime: dbJob.estimatedTime,
+          error: dbJob.error || undefined,
+          retryCount: dbJob.retryCount,
+          maxRetries: dbJob.maxRetries
+        }
+        return job
+      }
+
+      return null
+    } catch (error) {
+      logger.error('Failed to get job status from database', { error, jobId })
+      return null
+    }
   }
 
   /**
    * Get all jobs for a user
    */
-  getUserJobs(userId: string): VideoProcessingJob[] {
-    // In production, this would filter by user ID
-    return [...this.queue, ...this.processing]
+  async getUserJobs(userId: string): Promise<VideoProcessingJob[]> {
+    try {
+      // Get jobs from database
+      const dbJobs = await VideoDatabaseService.getUserVideoJobs(userId)
+
+      // Convert to in-memory format
+      const jobs: VideoProcessingJob[] = dbJobs.map((dbJob: any) => ({
+        id: dbJob.id,
+        videoId: dbJob.videoId,
+        platform: dbJob.platform,
+        status: dbJob.status as 'queued' | 'processing' | 'completed' | 'failed',
+        priority: dbJob.priority as 'low' | 'normal' | 'high',
+        createdAt: dbJob.createdAt,
+        startedAt: dbJob.startedAt || undefined,
+        completedAt: dbJob.completedAt || undefined,
+        progress: dbJob.progress,
+        currentStep: dbJob.currentStep,
+        estimatedTime: dbJob.estimatedTime,
+        error: dbJob.error || undefined,
+        retryCount: dbJob.retryCount,
+        maxRetries: dbJob.maxRetries
+      }))
+
+      return jobs
+    } catch (error) {
+      logger.error('Failed to get user jobs from database', { error, userId })
+      return []
+    }
   }
 
   /**
    * Cancel a processing job
    */
-  cancelJob(jobId: string): boolean {
-    const queueIndex = this.queue.findIndex(j => j.id === jobId)
-    if (queueIndex !== -1) {
-      this.queue.splice(queueIndex, 1)
-      logger.info('Video processing job cancelled from queue', { jobId })
-      return true
+  async cancelJob(jobId: string): Promise<boolean> {
+    try {
+      const queueIndex = this.queue.findIndex(j => j.id === jobId)
+      if (queueIndex !== -1) {
+        this.queue.splice(queueIndex, 1)
+
+        // Update database
+        await VideoDatabaseService.updateVideoJob(jobId, {
+          status: 'failed',
+          error: 'Job cancelled by user',
+          completedAt: new Date()
+        })
+
+        logger.info('Video processing job cancelled from queue', { jobId })
+        return true
+      }
+
+      const processingIndex = this.processing.findIndex(j => j.id === jobId)
+      if (processingIndex !== -1) {
+        const job = this.processing[processingIndex]
+        job.status = 'failed'
+        job.error = 'Job cancelled by user'
+        job.completedAt = new Date()
+
+        // Update database
+        await VideoDatabaseService.updateVideoJob(jobId, {
+          status: 'failed',
+          error: 'Job cancelled by user',
+          completedAt: new Date()
+        })
+
+        this.processing.splice(processingIndex, 1)
+        logger.info('Video processing job cancelled during processing', { jobId })
+        return true
+      }
+
+      return false
+    } catch (error) {
+      logger.error('Failed to cancel job', { error, jobId })
+      return false
     }
-
-    const processingIndex = this.processing.findIndex(j => j.id === jobId)
-    if (processingIndex !== -1) {
-      const job = this.processing[processingIndex]
-      job.status = 'failed'
-      job.error = 'Job cancelled by user'
-      job.completedAt = new Date()
-
-      this.processing.splice(processingIndex, 1)
-      logger.info('Video processing job cancelled during processing', { jobId })
-      return true
-    }
-
-    return false
   }
 
   /**
    * Retry a failed job
    */
-  retryJob(jobId: string): boolean {
-    const failedJob = this.processing.find(j => j.id === jobId && j.status === 'failed')
-    if (!failedJob) return false
+  async retryJob(jobId: string): Promise<boolean> {
+    try {
+      const failedJob = this.processing.find(j => j.id === jobId && j.status === 'failed')
+      if (!failedJob) return false
 
-    if (failedJob.retryCount >= failedJob.maxRetries) {
-      logger.warn('Video processing job max retries exceeded', { jobId, retryCount: failedJob.retryCount })
+      if (failedJob.retryCount >= failedJob.maxRetries) {
+        logger.warn('Video processing job max retries exceeded', { jobId, retryCount: failedJob.retryCount })
+        return false
+      }
+
+      // Remove from processing and add back to queue
+      const index = this.processing.findIndex(j => j.id === jobId)
+      this.processing.splice(index, 1)
+
+      failedJob.status = 'queued'
+      failedJob.progress = 0
+      failedJob.currentStep = 'Queued for retry'
+      failedJob.estimatedTime = 0
+      failedJob.error = undefined
+      failedJob.retryCount++
+
+      // Update database
+      await VideoDatabaseService.updateVideoJob(jobId, {
+        status: 'queued',
+        progress: 0,
+        currentStep: 'Queued for retry',
+        estimatedTime: 0,
+        error: undefined
+      })
+
+      this.queue.push(failedJob)
+      this.sortQueue()
+
+      logger.info('Video processing job retry queued', { jobId, retryCount: failedJob.retryCount })
+      return true
+    } catch (error) {
+      logger.error('Failed to retry job', { error, jobId })
       return false
     }
-
-    // Remove from processing and add back to queue
-    const index = this.processing.findIndex(j => j.id === jobId)
-    this.processing.splice(index, 1)
-
-    failedJob.status = 'queued'
-    failedJob.progress = 0
-    failedJob.currentStep = 'Queued for retry'
-    failedJob.estimatedTime = 0
-    failedJob.error = undefined
-    failedJob.retryCount++
-
-    this.queue.push(failedJob)
-    this.sortQueue()
-
-    logger.info('Video processing job retry queued', { jobId, retryCount: failedJob.retryCount })
-    return true
   }
 
   /**
    * Get queue statistics
    */
-  getQueueStats() {
-    return {
-      totalJobs: this.queue.length + this.processing.length,
-      queuedJobs: this.queue.length,
-      processingJobs: this.processing.length,
-      completedJobs: 0, // Would track in production
-      failedJobs: 0, // Would track in production
-      averageProcessingTime: 0 // Would calculate in production
+  async getQueueStats() {
+    try {
+      // Get stats from database
+      const dbStats = await VideoDatabaseService.getQueueStats()
+      return dbStats
+    } catch (error) {
+      logger.error('Failed to get queue stats from database', { error })
+      // Fallback to in-memory stats
+      return {
+        totalJobs: this.queue.length + this.processing.length,
+        queuedJobs: this.queue.length,
+        processingJobs: this.processing.length,
+        completedJobs: 0,
+        failedJobs: 0,
+        averageProcessingTime: 0
+      }
     }
   }
 
@@ -220,6 +338,15 @@ export class VideoProcessingQueue {
       job.progress = 0
       job.estimatedTime = 300 // 5 minutes estimate
 
+      // Update database
+      await VideoDatabaseService.updateVideoJob(job.id, {
+        status: 'processing',
+        startedAt: job.startedAt,
+        currentStep: job.currentStep,
+        progress: job.progress,
+        estimatedTime: job.estimatedTime
+      })
+
       logger.info('Starting video processing job', {
         jobId: job.id,
         videoId: job.videoId,
@@ -236,6 +363,15 @@ export class VideoProcessingQueue {
       job.completedAt = new Date()
       job.estimatedTime = 0
 
+      // Update database
+      await VideoDatabaseService.updateVideoJob(job.id, {
+        status: 'completed',
+        progress: 100,
+        currentStep: job.currentStep,
+        completedAt: job.completedAt,
+        estimatedTime: 0
+      })
+
       logger.info('Video processing job completed', {
         jobId: job.id,
         videoId: job.videoId,
@@ -247,6 +383,14 @@ export class VideoProcessingQueue {
       job.error = error instanceof Error ? error.message : 'Unknown error'
       job.completedAt = new Date()
       job.estimatedTime = 0
+
+      // Update database
+      await VideoDatabaseService.updateVideoJob(job.id, {
+        status: 'failed',
+        error: job.error,
+        completedAt: job.completedAt,
+        estimatedTime: 0
+      })
 
       logger.error('Video processing job failed', {
         jobId: job.id,
@@ -287,6 +431,17 @@ export class VideoProcessingQueue {
       job.estimatedTime = steps.reduce((total, s) => total + s.duration, 0) -
                          steps.slice(0, steps.indexOf(step)).reduce((total, s) => total + s.duration, 0)
 
+      // Update database with progress
+      try {
+        await VideoDatabaseService.updateVideoJob(job.id, {
+          currentStep: job.currentStep,
+          progress: job.progress,
+          estimatedTime: job.estimatedTime
+        })
+      } catch (error) {
+        logger.error('Failed to update job progress in database', { error, jobId: job.id })
+      }
+
       await new Promise(resolve => setTimeout(resolve, step.duration * 1000))
     }
   }
@@ -308,13 +463,24 @@ export class VideoProcessingQueue {
   /**
    * Clean up old completed/failed jobs
    */
-  cleanupOldJobs(maxAgeHours: number = 24) {
-    const cutoffTime = new Date(Date.now() - maxAgeHours * 60 * 60 * 1000)
+  async cleanupOldJobs(maxAgeHours: number = 24) {
+    try {
+      // Clean up database
+      const deletedCount = await VideoDatabaseService.cleanupOldJobs(maxAgeHours)
 
-    this.processing = this.processing.filter(job =>
-      job.createdAt > cutoffTime || job.status === 'processing'
-    )
+      // Clean up in-memory queue
+      const cutoffTime = new Date(Date.now() - maxAgeHours * 60 * 60 * 1000)
 
-    logger.info('Cleaned up old video processing jobs', { maxAgeHours })
+      this.processing = this.processing.filter(job =>
+        job.createdAt > cutoffTime || job.status === 'processing'
+      )
+
+      logger.info('Cleaned up old video processing jobs', {
+        deletedCount,
+        maxAgeHours
+      })
+    } catch (error) {
+      logger.error('Failed to cleanup old jobs', { error })
+    }
   }
 }
