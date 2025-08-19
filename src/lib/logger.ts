@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
@@ -9,39 +6,39 @@ export enum LogLevel {
 }
 
 class Logger {
-  private logFile: string
   private logLevel: LogLevel
 
   constructor() {
-    this.logFile = path.join(process.cwd(), 'logs', 'app.log')
     this.logLevel = LogLevel.DEBUG // Set to DEBUG for detailed logging
   }
 
   private formatMessage(level: string, message: string, data?: unknown): string {
     const timestamp = new Date().toISOString()
     const dataStr = data ? ` | ${JSON.stringify(data, null, 2)}` : ''
-    return `[${timestamp}] ${level}: ${message}${dataStr}\n`
-  }
-
-  private writeToFile(message: string) {
-    try {
-      // Ensure logs directory exists
-      const logsDir = path.dirname(this.logFile)
-      if (!fs.existsSync(logsDir)) {
-        fs.mkdirSync(logsDir, { recursive: true })
-      }
-
-      fs.appendFileSync(this.logFile, message)
-    } catch (error) {
-      console.error('Failed to write to log file:', error)
-    }
+    return `[${timestamp}] ${level}: ${message}${dataStr}`
   }
 
   private log(level: LogLevel, levelName: string, message: string, data?: unknown) {
     if (level >= this.logLevel) {
       const formattedMessage = this.formatMessage(levelName, message, data)
-      console.log(formattedMessage.trim())
-      this.writeToFile(formattedMessage)
+
+      // Use appropriate console method based on level
+      switch (level) {
+        case LogLevel.DEBUG:
+          console.debug(formattedMessage)
+          break
+        case LogLevel.INFO:
+          console.info(formattedMessage)
+          break
+        case LogLevel.WARN:
+          console.warn(formattedMessage)
+          break
+        case LogLevel.ERROR:
+          console.error(formattedMessage)
+          break
+        default:
+          console.log(formattedMessage)
+      }
     }
   }
 
