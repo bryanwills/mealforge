@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Upload, Link as LinkIcon, Camera, FileText, Loader2, AlertCircle, CheckCircle, Image as ImageIcon, X } from "lucide-react";
+import { Upload, Link as LinkIcon, Camera, FileText, Loader2, AlertCircle, CheckCircle, Image as ImageIcon, X, Video } from "lucide-react";
 import Link from "next/link";
 import { RecipeImportPreview } from "@/components/recipe-import-preview";
 import { ImportedRecipeData } from "@/lib/url-import-service";
@@ -312,7 +312,7 @@ export default function ImportRecipePage() {
         )}
 
         {/* Import Methods */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card
             className={`cursor-pointer transition-all hover:scale-105 ${
               importMethod === 'image'
@@ -347,6 +347,21 @@ export default function ImportRecipePage() {
               </CardTitle>
               <CardDescription className="text-gray-600 dark:text-gray-300">
                 Import recipe from a website URL
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card
+            className="cursor-pointer transition-all hover:scale-105 bg-white/70 dark:bg-gray-800/70 border-orange-200 dark:border-gray-700"
+            onClick={() => router.push('/recipes/import/video')}
+          >
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-gray-800 dark:text-white">
+                <Video className="h-5 w-5 text-orange-500 dark:text-orange-400" />
+                <span>Video Import</span>
+              </CardTitle>
+              <CardDescription className="text-gray-600 dark:text-gray-300">
+                Extract recipes from TikTok, Instagram, YouTube videos with 100% accuracy
               </CardDescription>
             </CardHeader>
           </Card>
