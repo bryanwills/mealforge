@@ -93,6 +93,66 @@
    - Docker containerization for easy deployment
    - Cost reduction for high-volume users
 
+#### Phase 5: Video Recipe Import Integration 🎥
+**Target: 100% accuracy for video recipes**
+
+8. **iOS Share Extension for TikTok Integration**
+   - Native iOS share extension for MealForge app
+   - Direct TikTok video sharing to MealForge
+   - Instagram Reels and YouTube Shorts support
+   - Video metadata extraction (title, description, creator)
+   - Seamless integration with iOS share sheet
+
+9. **Web Video Import Interface**
+   - Drag & drop video file uploads
+   - Video URL paste functionality
+   - Support for TikTok, Instagram, YouTube, Facebook
+   - Video preview and validation
+   - Progress tracking for video processing
+
+10. **AI-Powered Video Analysis**
+    - **Video Frame Analysis**: Extract recipe images and text overlays
+    - **Audio Transcription**: Convert speech to text for instructions
+    - **Text Recognition (OCR)**: Read on-screen text and captions
+    - **Motion Analysis**: Detect cooking steps and ingredient usage
+    - **Multi-Modal AI**: Combine visual, audio, and text data
+
+11. **100% Accuracy Video Parsing**
+    - **Frame-by-Frame Analysis**: Process every video frame
+    - **Audio Segmentation**: Break down speech into recipe steps
+    - **Text Overlay Detection**: Capture on-screen ingredients and measurements
+    - **Temporal Alignment**: Sync visual and audio data
+    - **Confidence Scoring**: Validate each data point across multiple sources
+
+12. **Video Recipe Data Extraction**
+    - **Ingredient Lists**: Extract from text overlays and speech
+    - **Cooking Instructions**: Convert audio to step-by-step directions
+    - **Timing Information**: Extract prep and cook times from video
+    - **Serving Sizes**: Detect from visual cues and audio mentions
+    - **Recipe Title**: Extract from video title and description
+    - **Creator Attribution**: Credit original video creator
+
+13. **Platform-Specific Optimizations**
+    - **TikTok**: Handle vertical video format and short-form content
+    - **Instagram Reels**: Support square and vertical formats
+    - **YouTube Shorts**: Process horizontal and vertical content
+    - **Facebook Videos**: Handle various aspect ratios
+    - **Custom Video Uploads**: Support MP4, MOV, AVI formats
+
+14. **Video Processing Infrastructure**
+    - **Video Storage**: Secure cloud storage for uploaded videos
+    - **Processing Queue**: Background video analysis system
+    - **CDN Integration**: Fast video delivery and streaming
+    - **Compression**: Optimize video quality vs. processing speed
+    - **Metadata Extraction**: Extract platform-specific information
+
+15. **User Experience Enhancements**
+    - **Video Preview**: Show recipe video in recipe cards
+    - **Step-by-Step Playback**: Sync video with recipe instructions
+    - **Creator Attribution**: Link to original video content
+    - **Social Sharing**: Share recipes back to social platforms
+    - **Video Collections**: Organize recipes by video source
+
 ## Implementation Details
 
 ### Print URL Detection Logic
