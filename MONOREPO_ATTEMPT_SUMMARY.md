@@ -86,7 +86,7 @@ Instead of full monorepo conversion, consider this targeted approach:
 
 ### **What to Extract from Working Examples:**
 - **Clerk provider setup** - How they wrap the app
-- **Authentication flow** - How they handle sign-in/sign-out  
+- **Authentication flow** - How they handle sign-in/sign-out
 - **API route patterns** - How they use `auth()` and `currentUser()`
 - **Component structure** - How they separate client/server components
 - **Dependency versions** - The exact versions that work together
