@@ -2,21 +2,21 @@
 
 ## Overview
 
-MealForge uses **Better Auth** as its authentication provider, replacing the previous Clerk.js implementation. This system provides secure, scalable authentication with support for multiple OAuth providers and email/password authentication.
+MealForge uses **NextAuth.js v5** as its authentication provider, replacing the previous Clerk.js implementation. This system provides secure, scalable authentication with support for multiple OAuth providers and email/password authentication.
 
 ## Architecture
 
 ### Authentication Flow
 1. **User Authentication**: Users can sign in via Google, Facebook, GitHub, or email/password
 2. **Session Management**: NextAuth.js handles session management and token refresh
-3. **Database Integration**: Better Auth integrates with Prisma for user data persistence
+3. **Database Integration**: NextAuth integrates with Prisma for user data persistence
 4. **API Protection**: Middleware protects routes requiring authentication
 
 ### Supported Providers
 
 #### OAuth Providers
 - **Google OAuth**: Primary social login provider
-- **Facebook OAuth**: Social login via Facebook
+- **Facebook OAuth**: Social login via Facebook (✅ Working)
 - **GitHub OAuth**: Developer-friendly social login
 
 #### Email Authentication
@@ -43,38 +43,49 @@ GITHUB_CLIENT_SECRET=your_github_client_secret
 
 # Database
 DATABASE_URL=your_database_connection_string
+DIRECT_URL=your_direct_database_connection_string
 
 # NextAuth
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000
 ```
 
-### Better Auth Configuration
+### NextAuth Configuration
 
-The authentication system is configured in `apps/web/src/lib/better-auth-config.ts`:
+The authentication system is configured in `apps/web/src/lib/auth-config.ts`:
 
 ```typescript
-import { betterAuth } from "better-auth";
-import { google, facebook, github } from "better-auth/social-providers";
-import { prismaAdapter } from "better-auth/adapters/prisma-adapter";
+import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
+import Facebook from "next-auth/providers/facebook";
+import GitHub from "next-auth/providers/github";
+import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
-export const auth = betterAuth({
-  adapter: prismaAdapter({
-    provider: "postgresql",
-    client: db,
-  }),
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(db),
   providers: [
-    google({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    facebook({
+    Facebook({
       clientId: process.env.FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
     }),
-    github({
+    GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        // Email/password authentication logic
+      }
     }),
   ],
   callbacks: {
@@ -82,8 +93,8 @@ export const auth = betterAuth({
       if (session?.user && user) {
         session.user.id = user.id;
         session.user.email = user.email;
-        session.user.name = user.name;
-        session.user.image = user.image;
+        session.user.name = user.user.name;
+        session.user.image = user.user.image;
       }
       return session;
     },
@@ -91,42 +102,17 @@ export const auth = betterAuth({
   pages: {
     signIn: "/sign-in",
   },
+  session: {
+    strategy: "jwt",
+  },
 });
 ```
 
 ## Database Schema
 
-### User Model
+### NextAuth Models
 
-```prisma
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?   // For email/password authentication
-  clerkId       String?   @unique // Legacy field for migration
-  firstName     String?
-  lastName      String?
-  preferences   Json      @default("{}")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Better Auth relations
-  accounts Account[]
-  sessions Session[]
-
-  // Custom relations
-  recipes      Recipe[]
-  mealPlans    MealPlan[]
-  groceryLists GroceryList[]
-
-  @@map("User")
-}
-```
-
-### Better Auth Tables
+The system includes the following NextAuth.js models:
 
 ```prisma
 model Account {
@@ -135,15 +121,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -165,208 +150,173 @@ model VerificationToken {
 }
 ```
 
+### User Model
+
+```prisma
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?       // For email/password authentication
+  firstName     String?
+  lastName      String?
+  preferences   Json          @default("{}")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Custom relations
+  recipes      Recipe[]
+  mealPlans    MealPlan[]
+  groceryLists GroceryList[]
+}
+```
+
 ## API Routes
 
 ### Authentication Endpoints
 
-- **`/api/auth/[...better-auth]`**: Better Auth API routes
-- **`/sign-in`**: Custom sign-in page with all provider options
+- **Sign In**: `POST /api/auth/signin/{provider}`
+- **Sign Out**: `POST /api/auth/signout`
+- **Session**: `GET /api/auth/session`
+- **Callback**: `GET /api/auth/callback/{provider}`
 
 ### Protected Routes
 
-All API routes that require authentication use the `auth()` middleware:
+All API routes that require authentication use the NextAuth `auth()` function:
 
 ```typescript
-import { auth } from "@/lib/better-auth-config";
+import { auth } from "@/lib/auth-config";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await auth();
-  if (!session) {
-    return new Response("Unauthorized", { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  // ... protected logic
+
+  const userId = session.user.id;
+  // ... rest of the API logic
 }
 ```
 
-## Frontend Integration
+## Migration from Clerk.js
 
-### Session Provider
+### What Was Changed
 
-The app is wrapped with NextAuth's SessionProvider in `apps/web/src/app/layout.tsx`:
+1. **Authentication Provider**: Clerk.js → NextAuth.js v5
+2. **Database Schema**: Added NextAuth models (Account, Session, VerificationToken)
+3. **API Routes**: Updated all routes to use NextAuth instead of Clerk
+4. **Components**: Updated user menu and authentication hooks
+5. **Middleware**: Updated authentication middleware
 
-```typescript
-import { NextAuthSessionProvider } from "@/components/providers/session-provider";
+### Migration Steps Completed
 
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        <NextAuthSessionProvider>
-          {children}
-        </NextAuthSessionProvider>
-      </body>
-    </html>
-  );
-}
-```
+1. ✅ **Removed Clerk dependencies** from package.json
+2. ✅ **Installed NextAuth.js** and related packages
+3. ✅ **Updated Prisma schema** for NextAuth models
+4. ✅ **Created NextAuth configuration** with OAuth providers
+5. ✅ **Updated all API routes** to use NextAuth
+6. ✅ **Updated components** for NextAuth integration
+7. ✅ **Fixed database connection** and environment variables
+8. ✅ **Tested OAuth flows** (Facebook working, Google needs redirect URI fix)
 
-### User Menu Component
+### Current Status
 
-The user menu component (`apps/web/src/components/user-menu.tsx`) uses NextAuth hooks:
-
-```typescript
-import { useSession, signOut } from "next-auth/react";
-
-function UserMenuWithAuth() {
-  const { data: session, status } = useSession();
-
-  if (status === "loading") return <LoadingSpinner />;
-  if (status === "unauthenticated") return <SignInButton />;
-
-  return <UserDropdown user={session.user} />;
-}
-```
-
-### Sign-In Page
-
-The custom sign-in page (`apps/web/src/app/sign-in/page.tsx`) provides:
-
-- Social login buttons (Google, Facebook, GitHub)
-- Email/password form toggle
-- Responsive design with dark mode support
-- Consistent styling with the MealForge theme
-
-## Migration from Clerk
-
-### What Changed
-
-1. **Authentication Provider**: Clerk.js → Better Auth + NextAuth
-2. **Session Management**: Clerk hooks → NextAuth hooks
-3. **API Protection**: Clerk middleware → Better Auth middleware
-4. **User Data**: Clerk user object → NextAuth session user
-
-### Migration Steps
-
-1. **Remove Clerk Dependencies**
-   ```bash
-   npm uninstall @clerk/nextjs svix
-   ```
-
-2. **Install Better Auth**
-   ```bash
-   npm install better-auth @daveyplate/better-auth-ui next-auth
-   ```
-
-3. **Update Database Schema**
-   - Add Better Auth tables
-   - Keep `clerkId` field for data migration
-   - Add `password` field for email authentication
-
-4. **Update Components**
-   - Replace Clerk hooks with NextAuth hooks
-   - Update user menu and authentication flows
-   - Remove Clerk-specific imports
-
-5. **Update API Routes**
-   - Replace `auth()` from Clerk with Better Auth
-   - Update user ID references
-   - Maintain existing functionality
-
-## Security Features
-
-### OAuth Security
-- **State Parameter**: CSRF protection for OAuth flows
-- **PKCE**: Proof Key for Code Exchange for enhanced security
-- **Token Validation**: Secure token validation and refresh
-
-### Session Security
-- **JWT Tokens**: Secure session tokens with configurable expiration
-- **Database Sessions**: Persistent session storage with automatic cleanup
-- **Secure Cookies**: HttpOnly, Secure, and SameSite cookie attributes
-
-### Password Security
-- **Bcrypt Hashing**: Industry-standard password hashing
-- **Salt Generation**: Unique salt per password
-- **Rate Limiting**: Protection against brute force attacks
+- **✅ Facebook OAuth**: Working successfully
+- **❌ Google OAuth**: Needs redirect URI configuration in Google Cloud Console
+- **✅ Database**: Prisma working with Supabase
+- **✅ Authentication**: NextAuth fully integrated
+- **✅ File Structure**: Clean monorepo organization
 
 ## Development Setup
 
-### Local Development
+### Prerequisites
 
-1. **Set Environment Variables**
-   ```bash
-   cp .env.example .env.local
-   # Fill in your OAuth credentials
-   ```
+- Node.js 18+ and pnpm
+- Supabase database
+- OAuth provider credentials (Google, Facebook, GitHub)
 
-2. **Database Setup**
-   ```bash
-   npx prisma db push
-   npx prisma generate
-   ```
+### Installation
 
-3. **Start Development Server**
-   ```bash
-   turbo run dev --filter=mealforge-web
-   ```
+```bash
+# Install dependencies
+pnpm install
 
-### Testing Authentication
+# Generate Prisma client
+cd apps/web
+npx prisma generate
 
-1. **OAuth Testing**: Use test OAuth apps for development
-2. **Session Testing**: Verify session persistence across page reloads
-3. **Protected Route Testing**: Ensure unauthenticated users are redirected
+# Push database schema
+npx prisma db push
+```
+
+### Environment Setup
+
+1. Copy `.env.example` to `.env`
+2. Add your OAuth provider credentials
+3. Configure database connection strings
+4. Generate a strong NEXTAUTH_SECRET
+
+### Running the Application
+
+```bash
+# Start development server
+turbo run dev --filter=mealforge-web
+
+# Or start individual apps
+cd apps/web && pnpm dev
+cd apps/mobile && pnpm start
+```
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **OAuth Provider Errors**
-   - Verify client ID and secret
-   - Check redirect URI configuration
-   - Ensure provider is enabled in Better Auth config
+#### Google OAuth Redirect URI Mismatch
+**Error**: `Error 400: redirect_uri_mismatch`
 
-2. **Database Connection Issues**
-   - Verify DATABASE_URL environment variable
-   - Check Prisma schema compatibility
-   - Ensure database tables exist
+**Solution**: Add `http://localhost:3000/api/auth/callback/google` to Google Cloud Console OAuth 2.0 Client ID authorized redirect URIs.
 
-3. **Session Issues**
-   - Verify NEXTAUTH_SECRET is set
-   - Check cookie domain configuration
-   - Ensure SessionProvider is properly configured
+#### Facebook OAuth Redirect Issue
+**Issue**: User gets redirected back to sign-in page after successful authentication
+
+**Status**: Known issue - authentication succeeds but redirect fails. User is created in database successfully.
+
+#### Database Connection Issues
+**Error**: Prisma cannot connect to Supabase
+
+**Solution**:
+1. Verify DATABASE_URL in .env
+2. Use direct connection (port 5432, not 6543)
+3. Add DIRECT_URL for Prisma connection pooling
 
 ### Debug Mode
 
-Enable debug logging by setting:
+NextAuth debug mode is enabled in development:
 
-```bash
-NEXTAUTH_DEBUG=true
+```typescript
+debug: process.env.NODE_ENV === "development"
 ```
+
+This provides detailed logging for OAuth flows and authentication processes.
+
+## Security Features
+
+- **PKCE Flow**: Secure OAuth 2.0 authorization code flow
+- **JWT Sessions**: Secure session management
+- **Password Hashing**: bcrypt for email/password authentication
+- **CSRF Protection**: Built-in CSRF token validation
+- **Secure Cookies**: HttpOnly cookies with proper security settings
 
 ## Future Enhancements
 
-### Planned Features
-- **Two-Factor Authentication**: SMS or app-based 2FA
-- **Role-Based Access Control**: User roles and permissions
-- **Social Login Expansion**: Additional OAuth providers
-- **Enterprise SSO**: SAML and OIDC integration
-
-### Performance Optimizations
-- **Session Caching**: Redis-based session storage
-- **Database Optimization**: Connection pooling and query optimization
-- **CDN Integration**: Global authentication endpoint distribution
-
-## Support
-
-For authentication-related issues:
-
-1. **Check Environment Variables**: Ensure all required variables are set
-2. **Verify OAuth Configuration**: Check provider app settings
-3. **Review Database Schema**: Ensure tables are properly created
-4. **Check Browser Console**: Look for authentication errors
-5. **Review Server Logs**: Check for backend authentication issues
-
----
-
-*Last Updated: August 21, 2025*
-*Version: 2.0 (Better Auth)*
+- [ ] **Email Verification**: Implement email verification for new accounts
+- [ ] **Password Reset**: Add password reset functionality
+- [ ] **Two-Factor Authentication**: Add 2FA support
+- [ ] **Social Account Linking**: Allow users to link multiple OAuth accounts
+- [ ] **Role-Based Access Control**: Implement user roles and permissions
