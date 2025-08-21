@@ -1,6 +1,6 @@
-import { auth } from "@/lib/better-auth-config";
+import { auth } from "@/lib/auth-config";
 
-export default auth.middleware;
+export default auth;
 
 export const config = {
   matcher: [

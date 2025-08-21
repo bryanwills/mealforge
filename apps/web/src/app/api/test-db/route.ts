@@ -1,26 +1,26 @@
 import { NextResponse } from 'next/server'
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth-config'
 import { DataPersistenceService } from '@/lib/data-persistence'
 
 const dataService = new DataPersistenceService()
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await auth()
     const user = await currentUser()
 
-    if (!userId || !user) {
+    if (!session.user.id || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Test database connection
-    const dbUser = await dataService.getUserByClerkId(userId)
+    const dbUser = await dataService.getUserByClerkId(session.user.id)
 
     // If user doesn't exist, try to create them
     if (!dbUser) {
       try {
         const syncedUser = await dataService.syncUserFromAuth(
-          userId,
+          session.user.id,
           user.emailAddresses?.[0]?.emailAddress || '',
           user.firstName || undefined,
           user.lastName || undefined,

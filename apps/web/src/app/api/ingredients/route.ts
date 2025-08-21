@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth-config'
 import { DataPersistenceService } from '@/lib/data-persistence'
 import { logger } from '@/lib/logger'
 import { convertIngredientQuantity } from '@/lib/ingredient-conversions'
@@ -8,21 +8,21 @@ const dataService = new DataPersistenceService()
 
 export async function GET(request: NextRequest) {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user exists in database
-    let dbUser = await dataService.getUserByClerkId(userId)
+    let dbUser = await dataService.getUserByClerkId(session.user.id)
     if (!dbUser) {
       logger.info('User not found in database, attempting to sync...')
       try {
         const authService = new (await import('@/lib/auth-service')).AuthService(
-          new (await import('@/lib/auth-service')).ClerkAuthProvider()
+          new (await import('@/lib/auth-service')).NextAuthProvider()
         )
         const syncedUser = await authService.syncCurrentUser()
-        dbUser = await dataService.getUserByClerkId(userId)
+        dbUser = await dataService.getUserByClerkId(session.user.id)
         if (!dbUser) {
           return NextResponse.json({
             error: 'Failed to sync user to database. Please try signing out and back in.'
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     const userIngredients = await prisma.recipeIngredient.findMany({
       where: {
         recipe: {
-          userId: dbUser.id
+          session.user.id: dbUser.id
         }
       },
       include: {
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => a.name.localeCompare(b.name))
 
     logger.info('User ingredients retrieved', {
-      userId: dbUser.id,
+      session.user.id: dbUser.id,
       ingredientCount: aggregatedIngredients.length,
       totalRecipeIngredients: userIngredients.length
     })

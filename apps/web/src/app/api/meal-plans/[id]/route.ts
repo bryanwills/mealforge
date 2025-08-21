@@ -11,16 +11,16 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const dbUser = await dataService.getUserByClerkId(userId)
+    const dbUser = await dataService.getUserByClerkId(session.user.id)
     if (!dbUser) {
       return NextResponse.json(
         { error: 'User not found in database' },
@@ -52,16 +52,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = await auth()
+    const session = await auth()
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const dbUser = await dataService.getUserByClerkId(userId)
+    const dbUser = await dataService.getUserByClerkId(session.user.id)
     if (!dbUser) {
       return NextResponse.json(
         { error: 'User not found in database' },

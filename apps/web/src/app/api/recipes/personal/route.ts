@@ -4,9 +4,9 @@ import { db } from "@/lib/db"
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await auth()
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -15,7 +15,7 @@ export async function GET() {
 
     // Get the user from the database
     const user = await db.user.findUnique({
-      where: { clerkId: userId }
+      where: { clerkId: session.user.id }
     })
 
     if (!user) {
@@ -28,7 +28,7 @@ export async function GET() {
     // Fetch personal recipes for the user
     const recipes = await db.recipe.findMany({
       where: {
-        userId: user.id
+        session.user.id: user.id
       },
       include: {
         ingredients: {

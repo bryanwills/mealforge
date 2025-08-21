@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth-config'
 import { DataPersistenceService } from '@/lib/data-persistence'
 import { logger } from '@/lib/logger'
 
@@ -7,20 +7,20 @@ const dataService = new DataPersistenceService()
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await auth()
     const user = await currentUser()
 
-    logger.debug('User sync test started', { userId, hasUser: !!user })
+    logger.debug('User sync test started', { session.user.id, hasUser: !!user })
 
-    if (!userId || !user) {
+    if (!session.user.id || !user) {
       logger.warn('User not authenticated')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user exists in database
-    const dbUser = await dataService.getUserByClerkId(userId)
+    const dbUser = await dataService.getUserByClerkId(session.user.id)
     logger.debug('Database user lookup result', {
-      clerkUserId: userId,
+      clerkUserId: session.user.id,
       dbUserExists: !!dbUser,
       dbUserId: dbUser?.id,
       dbClerkId: dbUser?.clerkId
@@ -31,7 +31,7 @@ export async function GET() {
       logger.info('User not found in database, attempting to sync...')
       try {
         const syncedUser = await dataService.syncUserFromAuth(
-          userId,
+          session.user.id,
           user.emailAddresses?.[0]?.emailAddress || '',
           user.firstName || undefined,
           user.lastName || undefined,
@@ -45,7 +45,7 @@ export async function GET() {
         })
 
         return NextResponse.json({
-          clerkUserId: userId,
+          clerkUserId: session.user.id,
           clerkUser: {
             email: user.emailAddresses?.[0]?.emailAddress,
             firstName: user.firstName,
@@ -77,7 +77,7 @@ export async function GET() {
     })
 
     return NextResponse.json({
-      clerkUserId: userId,
+      clerkUserId: session.user.id,
       clerkUser: {
         email: user.emailAddresses?.[0]?.emailAddress,
         firstName: user.firstName,

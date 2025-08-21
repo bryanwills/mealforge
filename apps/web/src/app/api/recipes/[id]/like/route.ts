@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth-config'
 import { RecipeService } from '@/lib/recipe-service'
 import { DataPersistenceService } from '@/lib/data-persistence'
 import { logger } from '@/lib/logger'
@@ -12,15 +12,15 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user exists in database
-    let dbUser = await dataService.getUserByClerkId(userId)
+    let dbUser = await dataService.getUserByClerkId(session.user.id)
     logger.debug('Like recipe - User check', {
-      clerkUserId: userId,
+      clerkUserId: session.user.id,
       existsInDb: !!dbUser,
       dbUserId: dbUser?.id,
       dbClerkId: dbUser?.clerkId
@@ -31,18 +31,18 @@ export async function POST(
       // Try to sync the user first
       try {
         const authService = new (await import('@/lib/auth-service')).AuthService(
-          new (await import('@/lib/auth-service')).ClerkAuthProvider()
+          new (await import('@/lib/auth-service')).NextAuthProvider()
         )
         const syncedUser = await authService.syncCurrentUser()
         logger.info('User synced successfully', {
           syncedUserId: syncedUser?.id,
-          syncedClerkId: syncedUser?.provider === 'clerk' ? userId : null
+          syncedClerkId: syncedUser?.provider === 'clerk' ? session.user.id : null
         })
 
         // Get the synced user from database
-        dbUser = await dataService.getUserByClerkId(userId)
+        dbUser = await dataService.getUserByClerkId(session.user.id)
         if (!dbUser) {
-          logger.error('User still not found after sync', { clerkUserId: userId })
+          logger.error('User still not found after sync', { clerkUserId: session.user.id })
           return NextResponse.json({
             error: 'Failed to sync user to database. Please try signing out and back in.'
           }, { status: 400 })
@@ -77,30 +77,30 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { userId } = await auth()
-    if (!userId) {
+    const session = await auth()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user exists in database
-    let dbUser = await dataService.getUserByClerkId(userId)
+    let dbUser = await dataService.getUserByClerkId(session.user.id)
     if (!dbUser) {
       logger.info('User not found in database, attempting to sync...')
       // Try to sync the user first
       try {
         const authService = new (await import('@/lib/auth-service')).AuthService(
-          new (await import('@/lib/auth-service')).ClerkAuthProvider()
+          new (await import('@/lib/auth-service')).NextAuthProvider()
         )
         const syncedUser = await authService.syncCurrentUser()
         logger.info('User synced successfully', {
           syncedUserId: syncedUser?.id,
-          syncedClerkId: syncedUser?.provider === 'clerk' ? userId : null
+          syncedClerkId: syncedUser?.provider === 'clerk' ? session.user.id : null
         })
 
         // Get the synced user from database
-        dbUser = await dataService.getUserByClerkId(userId)
+        dbUser = await dataService.getUserByClerkId(session.user.id)
         if (!dbUser) {
-          logger.error('User still not found after sync', { clerkUserId: userId })
+          logger.error('User still not found after sync', { clerkUserId: session.user.id })
           return NextResponse.json({
             error: 'Failed to sync user to database. Please try signing out and back in.'
           }, { status: 400 })

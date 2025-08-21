@@ -1,4 +1,4 @@
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth-config'
 import { DataPersistenceService } from './data-persistence'
 
 export interface UserInfo {
@@ -6,7 +6,7 @@ export interface UserInfo {
   email: string
   firstName?: string
   lastName?: string
-  provider: 'clerk' | 'supabase' | 'auth0' | 'custom'
+  provider: 'nextauth' | 'supabase' | 'auth0' | 'custom'
 }
 
 export interface AuthProvider {
@@ -14,35 +14,39 @@ export interface AuthProvider {
   getUserId(): Promise<string | null>
 }
 
-export class ClerkAuthProvider implements AuthProvider {
+export class NextAuthProvider implements AuthProvider {
   async getCurrentUser(): Promise<UserInfo | null> {
     try {
-      const { userId } = await auth()
-      const user = await currentUser()
+      const session = await auth()
 
-      if (!userId || !user) {
+      if (!session?.user?.id || !session?.user?.email) {
         return null
       }
 
+      // Split name into first and last name if available
+      const nameParts = session.user.name?.split(' ') || []
+      const firstName = nameParts[0] || undefined
+      const lastName = nameParts.slice(1).join(' ') || undefined
+
       return {
-        id: userId,
-        email: user.emailAddresses?.[0]?.emailAddress || '',
-        firstName: user.firstName || undefined,
-        lastName: user.lastName || undefined,
-        provider: 'clerk'
+        id: session.user.id,
+        email: session.user.email,
+        firstName,
+        lastName,
+        provider: 'nextauth'
       }
     } catch (error) {
-      console.error('Error getting Clerk user:', error)
+      console.error('Error getting NextAuth user:', error)
       return null
     }
   }
 
   async getUserId(): Promise<string | null> {
     try {
-      const { userId } = await auth()
-      return userId
+      const session = await auth()
+      return session?.user?.id || null
     } catch (error) {
-      console.error('Error getting Clerk user ID:', error)
+      console.error('Error getting NextAuth user ID:', error)
       return null
     }
   }

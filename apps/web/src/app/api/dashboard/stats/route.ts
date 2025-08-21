@@ -5,9 +5,9 @@ import { loadSavedRecipes } from "@/lib/saved-recipes-persistence"
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const session = await auth()
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -16,7 +16,7 @@ export async function GET() {
 
     // Get the user from the database
     const user = await db.user.findUnique({
-      where: { clerkId: userId }
+      where: { clerkId: session.user.id }
     })
 
     if (!user) {
@@ -28,18 +28,18 @@ export async function GET() {
 
     // Get saved recipes count from file-based storage
     const savedRecipes = loadSavedRecipes()
-    const userSavedRecipes = savedRecipes.get(userId) || new Set()
+    const userSavedRecipes = savedRecipes.get(session.user.id) || new Set()
     const savedCount = userSavedRecipes.size
 
 
 
     // Get other stats from database
     const mealPlansCount = await db.mealPlan.count({
-      where: { userId: user.id, isActive: true }
+      where: { session.user.id: user.id, isActive: true }
     })
 
     const groceryListsCount = await db.groceryList.count({
-      where: { userId: user.id, isActive: true }
+      where: { session.user.id: user.id, isActive: true }
     })
 
     const ingredientsCount = await db.ingredient.count({
@@ -63,6 +63,6 @@ export async function GET() {
 
 // Function to update saved recipes count (called from saved recipes API)
 // This is now handled by the file-based storage in saved-recipes-persistence
-function updateSavedRecipesCount(userId: string, count: number) {
-  console.log(`Saved recipes count updated for user ${userId}: ${count}`)
+function updateSavedRecipesCount(session.user.id: string, count: number) {
+  console.log(`Saved recipes count updated for user ${session.user.id}: ${count}`)
 }

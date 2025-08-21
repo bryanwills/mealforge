@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth-config";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -6,39 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, BookOpen, Calendar, ShoppingCart, ChefHat, Search } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { db } from "@/lib/db";
-import { DataPersistenceService } from "@/lib/data-persistence";
-import { AuthService, ClerkAuthProvider } from "@/lib/auth-service";
+import { AuthService, NextAuthProvider } from "@/lib/auth-service";
 
 async function getDashboardStats(userId: string) {
   try {
-    const dataService = new DataPersistenceService();
-    
-    // First, try to get user from database
-    let user = await dataService.getUserByClerkId(userId);
-
-    // If user doesn't exist, try to sync it
-    if (!user) {
-      try {
-        const authService = new AuthService(new ClerkAuthProvider());
-        const syncedUser = await authService.syncCurrentUser();
-        
-        if (syncedUser && syncedUser.provider === 'clerk') {
-          user = await dataService.getUserByClerkId(userId);
-        }
-      } catch (syncError) {
-        console.error('User sync error:', syncError);
-      }
-
-      if (!user) {
-        return { savedRecipes: 0, mealPlans: 0, groceryLists: 0, ingredients: 0 };
-      }
-    }
-
     // Get all stats in parallel with error handling
     const [savedRecipesCount, mealPlansCount, groceryListsCount, ingredientsCount] = await Promise.all([
-      db.recipe.count({ where: { userId: user.id } }).catch(() => 0),
-      db.mealPlan.count({ where: { userId: user.id, isActive: true } }).catch(() => 0),
-      db.groceryList.count({ where: { userId: user.id, isActive: true } }).catch(() => 0),
+      db.recipe.count({ where: { userId: userId } }).catch(() => 0),
+      db.mealPlan.count({ where: { userId: userId, isActive: true } }).catch(() => 0),
+      db.groceryList.count({ where: { userId: userId, isActive: true } }).catch(() => 0),
       db.ingredient.count({ where: { isActive: true } }).catch(() => 0)
     ]);
 
@@ -55,13 +31,13 @@ async function getDashboardStats(userId: string) {
 }
 
 export default async function Home() {
-  const { userId } = await auth();
+  const session = await auth();
 
-  if (!userId) {
+  if (!session?.user?.id) {
     redirect("/sign-in");
   }
 
-  const stats = await getDashboardStats(userId);
+  const stats = await getDashboardStats(session.user.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">

@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get('userId')
+    const session.user.id = searchParams.get('session.user.id')
     const jobId = searchParams.get('jobId')
 
     if (jobId) {
@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    if (userId) {
+    if (session.user.id) {
       // Get all jobs for a user
       const queue = VideoProcessingQueue.getInstance()
-      const jobs = queue.getUserJobs(userId)
+      const jobs = queue.getUserJobs(session.user.id)
 
       return NextResponse.json({
         success: true,

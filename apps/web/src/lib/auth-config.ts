@@ -1,40 +1,74 @@
-import { AuthProvider } from './auth-service'
-import { ClerkAuthProvider } from './auth-service'
-import { SupabaseAuthProvider } from './supabase-auth-provider'
+import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
+import Facebook from "next-auth/providers/facebook";
+import GitHub from "next-auth/providers/github";
+import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { db } from "./db";
+import bcrypt from "bcryptjs";
 
-export type AuthProviderType = 'clerk' | 'supabase'
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(db),
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    Facebook({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
 
-export class AuthConfig {
-  private static instance: AuthConfig
-  private currentProvider: AuthProviderType = 'clerk'
+        const user = await db.user.findUnique({
+          where: { email: credentials.email }
+        });
 
-  private constructor() {}
+        if (!user || !user.password) {
+          return null;
+        }
 
-  static getInstance(): AuthConfig {
-    if (!AuthConfig.instance) {
-      AuthConfig.instance = new AuthConfig()
-    }
-    return AuthConfig.instance
-  }
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
 
-  setProvider(provider: AuthProviderType) {
-    this.currentProvider = provider
-  }
+        if (!isPasswordValid) {
+          return null;
+        }
 
-  getProvider(): AuthProviderType {
-    return this.currentProvider
-  }
+        return user;
+      }
+    }),
+  ],
+  callbacks: {
+    session: async ({ session, user }) => {
+      if (session?.user && user) {
+        session.user.id = user.id;
+        session.user.email = user.email;
+        session.user.name = user.name;
+        session.user.image = user.image;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/sign-in",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  debug: process.env.NODE_ENV === "development",
+});
 
-  createAuthProvider(): AuthProvider {
-    switch (this.currentProvider) {
-      case 'supabase':
-        return new SupabaseAuthProvider()
-      case 'clerk':
-      default:
-        return new ClerkAuthProvider()
-    }
-  }
-}
-
-// Export a singleton instance
-export const authConfig = AuthConfig.getInstance()
+export type Auth = typeof auth;

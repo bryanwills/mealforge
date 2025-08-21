@@ -80,9 +80,9 @@ export async function GET(
       }
     } else {
       // For personal recipes, fetch from database
-      const { userId } = await auth()
+      const session = await auth()
 
-      if (!userId) {
+      if (!session?.user?.id) {
         return NextResponse.json(
           { error: 'Unauthorized' },
           { status: 401 }
@@ -92,7 +92,7 @@ export async function GET(
       try {
         // Get the user from the database
         const user = await db.user.findUnique({
-          where: { clerkId: userId }
+          where: { clerkId: session.user.id }
         })
 
         if (!user) {
@@ -106,7 +106,7 @@ export async function GET(
         const recipe = await db.recipe.findFirst({
           where: {
             id: recipeId,
-            userId: user.id
+            session.user.id: user.id
           },
           include: {
             ingredients: {

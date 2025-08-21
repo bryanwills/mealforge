@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
-import { useAuth } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 
 export function useAuthSync() {
-  const { isSignedIn, userId } = useAuth()
+  const { data: session, status } = useSession()
+  const isSignedIn = status === 'authenticated'
+  const userId = session?.user?.id
 
   useEffect(() => {
     const syncUser = async () => {

@@ -4,9 +4,9 @@ import { db } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    const session = await auth();
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await db.user.findUnique({
-      where: { clerkId: userId },
+      where: { clerkId: session.user.id },
     });
 
     if (existingUser) {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // Create new user
     const user = await db.user.create({
       data: {
-        clerkId: userId,
+        clerkId: session.user.id,
         email: email || "",
         firstName: firstName || "",
         lastName: lastName || "",
@@ -59,9 +59,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const session = await auth();
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -69,7 +69,7 @@ export async function GET() {
     }
 
     const user = await db.user.findUnique({
-      where: { clerkId: userId },
+      where: { clerkId: session.user.id },
     });
 
     if (!user) {
