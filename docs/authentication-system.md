@@ -320,3 +320,216 @@ This provides detailed logging for OAuth flows and authentication processes.
 - [ ] **Two-Factor Authentication**: Add 2FA support
 - [ ] **Social Account Linking**: Allow users to link multiple OAuth accounts
 - [ ] **Role-Based Access Control**: Implement user roles and permissions
+- [ ] **AI Video Generation**: Premium feature for creating visual cooking guides
+- [ ] **Gamification System**: User rewards, leaderboards, and community features
+
+---
+
+## Planned Features
+
+### AI Video Generation System
+
+#### Overview
+MealForge will introduce an AI-powered video generation system that creates visual cooking guides for any recipe. This feature addresses the needs of users who require visual instruction rather than just written recipes.
+
+#### Target Users
+- **Primary**: Users who need visual guidance to follow recipes
+- **Secondary**: Users who prefer video content over text
+- **Community**: Users who want to share and discover visual recipes
+
+#### Video Generation Options
+1. **Overhead View**: Camera positioned above cooking surface showing ingredient preparation and cooking steps
+2. **AI Person**: Animated character demonstrating cooking techniques and movements
+3. **Hybrid Approach**: Combination of overhead shots and AI person demonstrations
+
+#### Recipe Sources
+The AI video generation will work with recipes from:
+- **Explore Page**: Community-shared recipes
+- **Image Import**: OCR-extracted recipes from photos
+- **URL Import**: Web-scraped recipes
+- **Manual Entry**: User-created recipes
+
+#### Technical Implementation
+- **AI Service Integration**: Support for multiple AI providers
+  - OpenAI (GPT-4, DALL-E, Sora)
+  - Google Gemini
+  - Anthropic Claude
+  - Grok
+  - OpenRouter (access to multiple models)
+- **Self-Hosted Support**: Users can configure their own AI API keys
+- **Video Generation Pipeline**: Automated process from recipe text to finished video
+- **Quality Control**: AI-generated content review and user feedback systems
+
+### Gamification System
+
+#### User Engagement Features
+- **Reward Points**: Earn points for various activities
+  - Creating AI videos
+  - Using AI videos
+  - Sharing recipes
+  - Community contributions
+- **Achievement Badges**: Unlock badges for milestones
+  - "Video Creator": Generate 10 AI videos
+  - "Community Helper": Share 25 recipes
+  - "Master Chef": Use 100 AI videos
+- **Experience Levels**: Progressive user levels with benefits
+  - Unlock premium features
+  - Access to advanced AI models
+  - Priority video generation
+
+#### Leaderboards
+- **Most AI Videos Created**: Top content creators
+- **Most AI Videos Used**: Most active learners
+- **Community Favorites**: Most-liked shared content
+- **Weekly/Monthly Challenges**: Time-based competitions
+
+#### Community Features
+- **Recipe Sharing**: Share AI-enhanced recipes with the community
+- **Video Library**: Browse and use community-generated videos
+- **Collaboration**: Work together on recipe improvements
+- **Rating System**: Rate and review AI-generated videos
+
+### Monetization Strategy
+
+#### Premium Tiers
+1. **Free Tier**: Limited AI video generation (e.g., 5 videos per month)
+2. **Pro Tier**: Unlimited AI videos, priority processing
+3. **Enterprise Tier**: Advanced features, custom AI model integration
+
+#### Revenue Streams
+- **Subscription Plans**: Monthly/yearly premium memberships
+- **Pay-per-Video**: One-time payment for individual video generation
+- **API Access**: Third-party developers using the video generation service
+- **White-label Solutions**: Custom branded versions for businesses
+
+### Technical Architecture
+
+#### AI Service Integration
+```typescript
+interface AIVideoService {
+  generateVideo(recipe: Recipe, options: VideoOptions): Promise<VideoResult>;
+  getSupportedProviders(): AIProvider[];
+  validateAPIKey(provider: AIProvider, key: string): Promise<boolean>;
+}
+
+interface VideoOptions {
+  style: 'overhead' | 'ai-person' | 'hybrid';
+  duration: number;
+  quality: 'standard' | 'hd' | '4k';
+  language: string;
+  aiProvider: AIProvider;
+}
+```
+
+#### Database Schema Extensions
+```prisma
+model AIVideo {
+  id          String   @id @default(cuid())
+  recipeId    String
+  userId      String
+  videoUrl    String
+  thumbnailUrl String?
+  style       String   // overhead, ai-person, hybrid
+  aiProvider  String   // openai, gemini, claude, etc.
+  duration    Int      // in seconds
+  quality     String   // standard, hd, 4k
+  status      String   // processing, completed, failed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recipe      Recipe   @relation(fields: [recipeId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  usage       VideoUsage[]
+}
+
+model VideoUsage {
+  id        String   @id @default(cuid())
+  videoId   String
+  userId    String
+  usedAt    DateTime @default(now())
+
+  video     AIVideo @relation(fields: [videoId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model UserRewards {
+  id           String @id @default(cuid())
+  userId       String @unique
+  points       Int    @default(0)
+  level        Int    @default(1)
+  achievements Json   @default("[]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User   @relation(fields: [userId], references: [id])
+}
+```
+
+#### Environment Configuration
+```bash
+# AI Service Configuration
+OPENAI_API_KEY=your_openai_key
+GEMINI_API_KEY=your_gemini_key
+ANTHROPIC_API_KEY=your_anthropic_key
+GROK_API_KEY=your_grok_key
+OPENROUTER_API_KEY=your_openrouter_key
+
+# Video Generation Settings
+VIDEO_GENERATION_ENABLED=true
+MAX_VIDEO_DURATION=300
+DEFAULT_VIDEO_QUALITY=hd
+AI_PROVIDER_PRIORITY=openai,gemini,anthropic
+
+# Self-Hosted Configuration
+SELF_HOSTED_AI_ENABLED=true
+CUSTOM_AI_ENDPOINTS={"custom-provider": "https://api.custom.com"}
+```
+
+### Implementation Phases
+
+#### Phase 1: Foundation (Months 1-2)
+- [ ] Research AI video generation services and APIs
+- [ ] Design database schema for videos and rewards
+- [ ] Implement basic AI service integration framework
+- [ ] Create video generation queue system
+
+#### Phase 2: Core Features (Months 3-4)
+- [ ] Implement OpenAI integration for video generation
+- [ ] Create video processing pipeline
+- [ ] Build basic video player and management
+- [ ] Implement user reward system
+
+#### Phase 3: Gamification (Months 5-6)
+- [ ] Add achievement and leveling system
+- [ ] Implement leaderboards and challenges
+- [ ] Create community sharing features
+- [ ] Build user engagement analytics
+
+#### Phase 4: Premium Features (Months 7-8)
+- [ ] Implement subscription management
+- [ ] Add advanced AI model options
+- [ ] Create white-label solutions
+- [ ] Optimize video generation performance
+
+### Research and Development
+
+#### AI Video Generation Services
+- **Runway ML**: AI video generation platform
+- **Pika Labs**: Text-to-video AI service
+- **Stable Video**: Open-source video generation
+- **Custom Solution**: Build using OpenAI's Sora API or similar
+
+#### Technical Considerations
+- **Video Storage**: Cloud storage for generated videos
+- **Processing Time**: Queue management for video generation
+- **Quality Control**: AI content moderation and user feedback
+- **Scalability**: Handle multiple concurrent video generation requests
+- **Cost Management**: Optimize AI API usage and costs
+
+#### User Experience
+- **Video Preview**: Show generation progress and preview
+- **Customization**: Allow users to adjust video style and duration
+- **Accessibility**: Support for multiple languages and closed captions
+- **Mobile Optimization**: Ensure videos work well on mobile devices
+
+This AI video generation system represents a significant competitive advantage and could position MealForge as the go-to platform for visual recipe learning and community-driven cooking content.
