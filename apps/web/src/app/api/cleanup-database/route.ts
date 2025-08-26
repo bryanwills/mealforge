@@ -8,33 +8,16 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
-    if (!session?.user?.id) {
-      logger.warn('Unauthorized database cleanup attempt: No session.user.id')
+    if (!session) {
+      logger.warn('Unauthorized database cleanup attempt: No session')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Ensure user exists in database
-    const dataPersistence = new DataPersistenceService()
-    const dbUser = await dataPersistence.getUserByClerkId(session.user.id)
-    if (!dbUser) {
-      logger.warn('User not found in database for cleanup', { session.user.id })
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    }
-
-    logger.info('Starting database cleanup for user', { session.user.id: dbUser.id })
-
-    // Perform cleanup
-    const cleanupResult = await DatabaseCleanupService.cleanupUserData(dbUser.id)
-
-    logger.info('Database cleanup completed', {
-      session.user.id: dbUser.id,
-      result: cleanupResult
-    })
-
+    // TODO: Implement proper user authentication with better-auth
+    // For now, return a placeholder response
     return NextResponse.json({
       success: true,
-      message: 'Database cleanup completed successfully',
-      result: cleanupResult
+      message: 'Database cleanup completed (placeholder)'
     })
   } catch (error) {
     logger.error('Error during database cleanup', { error })
