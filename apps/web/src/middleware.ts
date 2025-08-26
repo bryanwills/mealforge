@@ -1,6 +1,12 @@
 import { auth } from "@/lib/auth-config";
 
-export default auth;
+// TODO: Implement proper better-auth middleware
+// For now, just pass through all requests
+export default function middleware() {
+  // Placeholder middleware - will implement proper auth later
+  // This allows the app to run while we figure out better-auth
+  return;
+}
 
 export const config = {
   matcher: [
