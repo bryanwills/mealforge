@@ -1,43 +1,12 @@
-import { auth } from "@/lib/auth-config";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, BookOpen, Calendar, ShoppingCart, ChefHat, Search } from "lucide-react";
 import { Navigation } from "@/components/navigation";
-import { db } from "@/lib/db";
-import { AuthService, NextAuthProvider } from "@/lib/auth-service";
-
-async function getDashboardStats(userId: string) {
-  try {
-    // Get all stats in parallel with error handling
-    const [savedRecipesCount, mealPlansCount, groceryListsCount, ingredientsCount] = await Promise.all([
-      db.recipe.count({ where: { userId: userId } }).catch(() => 0),
-      db.mealPlan.count({ where: { userId: userId, isActive: true } }).catch(() => 0),
-      db.groceryList.count({ where: { userId: userId, isActive: true } }).catch(() => 0),
-      db.ingredient.count({ where: { isActive: true } }).catch(() => 0)
-    ]);
-
-    return {
-      savedRecipes: savedRecipesCount,
-      mealPlans: mealPlansCount,
-      groceryLists: groceryListsCount,
-      ingredients: ingredientsCount
-    };
-  } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
-    return { savedRecipes: 0, mealPlans: 0, groceryLists: 0, ingredients: 0 };
-  }
-}
 
 export default async function Home() {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect("/sign-in");
-  }
-
-  const stats = await getDashboardStats(session.user.id);
+  // TODO: Implement proper authentication with better-auth
+  // For now, show a simple welcome page
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 dark:from-gray-900 dark:to-gray-800">
@@ -61,7 +30,7 @@ export default async function Home() {
                 <BookOpen className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.savedRecipes}</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   Saved recipes
                 </p>
@@ -76,7 +45,7 @@ export default async function Home() {
                 <Calendar className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.mealPlans}</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   Active plans
                 </p>
@@ -91,7 +60,7 @@ export default async function Home() {
                 <ShoppingCart className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.groceryLists}</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
                   Active lists
                 </p>
@@ -106,92 +75,28 @@ export default async function Home() {
                 <ChefHat className="h-4 w-4 text-orange-500 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.ingredients}</div>
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">0</div>
                 <p className="text-xs text-gray-600 dark:text-gray-300">
-                  In database
+                  Available ingredients
                 </p>
               </CardContent>
             </Card>
           </Link>
         </div>
 
-        {/* Action Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700 hover:shadow-lg transition-all hover:scale-105 flex flex-col h-full">
-            <CardHeader>
-              <CardTitle className="text-gray-800 dark:text-white">Create Recipe</CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Add a new recipe to your collection
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="mt-auto">
-                <Link href="/recipes/new">
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Recipe
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700 hover:shadow-lg transition-all hover:scale-105 flex flex-col h-full">
-            <CardHeader>
-              <CardTitle className="text-gray-800 dark:text-white">Explore Recipes</CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Discover recipes from around the web
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="mt-auto">
-                <Link href="/explore">
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
-                    <Search className="mr-2 h-4 w-4" />
-                    Explore
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700 hover:shadow-lg transition-all hover:scale-105 flex flex-col h-full">
-            <CardHeader>
-              <CardTitle className="text-gray-800 dark:text-white">Plan Meals</CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Create a meal plan for the week
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="mt-auto">
-                <Link href="/meal-plans/new">
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    New Meal Plan
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-orange-200 dark:border-gray-700 hover:shadow-lg transition-all hover:scale-105 flex flex-col h-full">
-            <CardHeader>
-              <CardTitle className="text-gray-800 dark:text-white">Grocery List</CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">
-                Generate a grocery list from your meal plan
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="mt-auto">
-                <Link href="/grocery-lists/new">
-                  <Button className="w-full bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 text-white">
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    New Grocery List
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Authentication Notice */}
+        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6 text-center">
+          <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">
+            Authentication Coming Soon
+          </h3>
+          <p className="text-orange-700 dark:text-orange-300 mb-4">
+            We're currently setting up better-auth for secure authentication. Sign-in functionality will be available shortly.
+          </p>
+          <Link href="/sign-in">
+            <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:text-orange-300 dark:hover:bg-orange-800">
+              Go to Sign In
+            </Button>
+          </Link>
         </div>
       </main>
     </div>
