@@ -104,7 +104,7 @@ export const VideoImportZone: React.FC<VideoImportZoneProps> = ({
       const result = await VideoImportService.importFromVideoURL(videoUrl.trim())
 
       if (result.success) {
-        setSuccess(`Successfully imported recipe from ${result.videoMetadata.platform}`)
+        setSuccess(`Successfully imported recipe from ${result.videoMetadata?.platform || 'video'}`)
         onUrlImport(result)
         setVideoUrl('')
         setDetectedPlatform(null)
@@ -176,7 +176,7 @@ export const VideoImportZone: React.FC<VideoImportZoneProps> = ({
             Import Recipe from Video
           </CardTitle>
           <CardDescription>
-            Drag & drop a video file or click to browse. Supports {supportedFormats.join(', ')} up to {Math.round(importLimits.maxSize / (1024 * 1024))}MB.
+            Drag & drop a video file or click to browse. Supports {supportedFormats.join(', ')} up to {Math.round(importLimits.maxFileSize / (1024 * 1024))}MB.
           </CardDescription>
         </CardHeader>
         <CardContent>
