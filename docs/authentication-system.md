@@ -533,3 +533,4 @@ CUSTOM_AI_ENDPOINTS={"custom-provider": "https://api.custom.com"}
 - **Mobile Optimization**: Ensure videos work well on mobile devices
 
 This AI video generation system represents a significant competitive advantage and could position MealForge as the go-to platform for visual recipe learning and community-driven cooking content.
+
