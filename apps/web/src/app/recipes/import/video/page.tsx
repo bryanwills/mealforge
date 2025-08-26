@@ -128,7 +128,7 @@ export default function VideoImportPage() {
   }
 
   const getVideoMetadata = () => {
-    if (!importResult) return null
+    if (!importResult || !importResult.videoMetadata) return null
 
     return {
       platform: importResult.videoMetadata.platform,
@@ -212,8 +212,8 @@ export default function VideoImportPage() {
             currentStep={currentStepName}
             estimatedTime={estimatedTime}
             steps={processingSteps}
-            error={error}
-            videoMetadata={getVideoMetadata()}
+            error={error || undefined}
+            videoMetadata={getVideoMetadata() || undefined}
           />
         </TabsContent>
 
@@ -221,9 +221,8 @@ export default function VideoImportPage() {
         <TabsContent value="preview" className="mt-0">
           {importResult && (
             <VideoRecipePreview
-              result={importResult}
+              importResult={importResult}
               onSave={handleSaveRecipe}
-              onCancel={handleCancel}
             />
           )}
         </TabsContent>

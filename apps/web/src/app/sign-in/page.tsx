@@ -1,6 +1,5 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook, FaGithub } from "react-icons/fa";
@@ -14,15 +13,18 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/" });
+    // TODO: Implement better-auth Google sign-in
+    console.log("Google sign-in");
   };
 
   const handleFacebookSignIn = () => {
-    signIn("facebook", { callbackUrl: "/" });
+    // TODO: Implement better-auth Facebook sign-in
+    console.log("Facebook sign-in");
   };
 
   const handleGitHubSignIn = () => {
-    signIn("github", { callbackUrl: "/" });
+    // TODO: Implement better-auth GitHub sign-in
+    console.log("GitHub sign-in");
   };
 
   const handleEmailSignUp = (e: React.FormEvent) => {
