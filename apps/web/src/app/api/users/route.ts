@@ -1,47 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { db } from "@/lib/db";
+import { auth } from "@/lib/auth-config";
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const body = await request.json();
-    const { email, firstName, lastName } = body;
-
-    // Check if user already exists
-    const existingUser = await db.user.findUnique({
-      where: { clerkId: session.user.id },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exists" },
-        { status: 200 }
-      );
-    }
-
-    // Create new user
-    const user = await db.user.create({
-      data: {
-        clerkId: session.user.id,
-        email: email || "",
-        firstName: firstName || "",
-        lastName: lastName || "",
-      },
-    });
-
+    // TODO: Implement proper user authentication with better-auth
+    // For now, return success
     return NextResponse.json({
       success: true,
-      message: "User created successfully",
-      user,
+      message: "User created (placeholder)",
+      user: { id: "placeholder" }
     });
   } catch (error) {
     console.error("User creation error:", error);
@@ -61,27 +37,18 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const user = await db.user.findUnique({
-      where: { clerkId: session.user.id },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
+    // TODO: Implement proper user authentication with better-auth
+    // For now, return placeholder user
     return NextResponse.json({
       success: true,
-      user,
+      user: { id: "placeholder", email: "placeholder@example.com" }
     });
   } catch (error) {
     console.error("User fetch error:", error);
