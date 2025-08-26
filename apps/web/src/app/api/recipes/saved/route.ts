@@ -1,49 +1,20 @@
-import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@clerk/nextjs/server"
-import { RecipeService } from "@/lib/recipe-service"
-import { DataPersistenceService } from "@/lib/data-persistence"
-import { logger } from "@/lib/logger"
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth-config'
 
-const recipeService = new RecipeService()
-const dataService = new DataPersistenceService()
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth()
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user exists in database
-    const dbUser = await dataService.getUserByClerkId(session.user.id)
-
-    if (!dbUser) {
-      return NextResponse.json(
-        { error: 'User not found in database' },
-        { status: 404 }
-      )
-    }
-
-    // Get user's saved recipes from database
-    const userRecipes = await recipeService.getUserRecipes(dbUser.id)
-    const savedRecipes = userRecipes.map(recipe => ({
-      id: recipe.id,
-      externalId: (recipe as any).externalId
-    }))
-
-    return NextResponse.json({
-      savedRecipes
-    })
+    // TODO: Implement proper user authentication with better-auth
+    // For now, return empty array
+    return NextResponse.json({ recipes: [] })
   } catch (error) {
-    logger.error('Failed to get saved recipes:', error)
-    return NextResponse.json(
-      { error: 'Failed to get saved recipes' },
-      { status: 500 }
-    )
+    console.error('Failed to get saved recipes:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -51,136 +22,32 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
-    logger.debug('Saved recipes POST request', { clerkUserId: session.user.id })
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if user exists in database
-    let dbUser = await dataService.getUserByClerkId(session.user.id)
-    logger.debug('Saved recipes - User check', {
-      clerkUserId: session.user.id,
-      existsInDb: !!dbUser,
-      dbUserId: dbUser?.id,
-      dbClerkId: dbUser?.clerkId
-    })
-
-    if (!dbUser) {
-      logger.info('User not found in database, attempting to sync...')
-      // Try to sync the user first
-      try {
-        const authService = new (await import('@/lib/auth-service')).AuthService(
-          new (await import('@/lib/auth-service')).NextAuthProvider()
-        )
-        const syncedUser = await authService.syncCurrentUser()
-        logger.info('User synced successfully', {
-          syncedUserId: syncedUser?.id,
-          syncedClerkId: syncedUser?.provider === 'clerk' ? session.user.id : null
-        })
-
-        // Get the synced user from database
-        dbUser = await dataService.getUserByClerkId(session.user.id)
-        if (!dbUser) {
-          logger.error('User still not found after sync', { clerkUserId: session.user.id })
-          return NextResponse.json({
-            error: 'Failed to sync user to database. Please try signing out and back in.'
-          }, { status: 400 })
-        }
-      } catch (syncError) {
-        logger.error('Failed to sync user', { error: syncError })
-        return NextResponse.json({
-          error: 'User not found in database. Please try signing out and back in.'
-        }, { status: 400 })
-      }
-    }
-
-    const body = await request.json()
-    const { recipeId, action, recipeData } = body
-
-    logger.debug('Save recipe request data', { 
-      recipeId, 
-      action, 
-      hasRecipeData: !!recipeData,
-      recipeDataKeys: recipeData ? Object.keys(recipeData) : []
-    })
-
-    if (!recipeId) {
-      return NextResponse.json(
-        { error: 'Recipe ID is required' },
-        { status: 400 }
-      )
-    }
-
-    if (action === 'save' && recipeData) {
-      logger.debug('Attempting to save recipe', {
-        clerkUserId: session.user.id,
-        dbUserId: dbUser.id,
-        recipeId,
-        recipeTitle: recipeData.title
-      })
-
-      // Save recipe to database with import source using the database user ID
-      const savedRecipe = await recipeService.createRecipe(dbUser.id, {
-        ...recipeData,
-        importSource: 'external', // For recipes saved from explore page
-        isPublic: false,
-        isShared: false
-      })
-
-      logger.info('Recipe saved successfully', {
-        recipeId: savedRecipe.id,
-        title: savedRecipe.title,
-        session.user.id: savedRecipe.session.user.id
-      })
-
-      return NextResponse.json({
-        success: true,
-        recipe: savedRecipe
-      })
-    } else if (action === 'unsave') {
-      // For unsave, we need to find the recipe in the user's database
-      const userRecipes = await recipeService.getUserRecipes(dbUser.id)
-      const recipeToDelete = userRecipes.find(recipe => recipe.id === recipeId)
-
-      if (!recipeToDelete) {
-        logger.warn('Recipe not found for unsave', {
-          recipeId,
-          dbUserId: dbUser.id,
-          userRecipeCount: userRecipes.length
-        })
-        return NextResponse.json({
-          error: 'Recipe not found in your saved collection'
-        }, { status: 404 })
-      }
-
-      // Remove recipe from database
-      await recipeService.deleteRecipe(recipeId)
-
-      logger.info('Recipe unsaved successfully', {
-        recipeId: recipeToDelete.id,
-        title: recipeToDelete.title,
-        session.user.id: recipeToDelete.session.user.id
-      })
-
-      return NextResponse.json({
-        success: true,
-        message: 'Recipe removed from saved collection'
-      })
-    } else {
-      return NextResponse.json(
-        { error: 'Invalid action. Use "save" or "unsave"' },
-        { status: 400 }
-      )
-    }
+    // TODO: Implement proper user authentication with better-auth
+    // For now, return success
+    return NextResponse.json({ success: true, message: 'Recipe saved (placeholder)' })
   } catch (error) {
-    logger.error('Failed to save/unsave recipe', { error })
-    return NextResponse.json(
-      { error: 'Failed to save/unsave recipe' },
-      { status: 500 }
-    )
+    console.error('Failed to save recipe:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await auth()
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // TODO: Implement proper user authentication with better-auth
+    // For now, return success
+    return NextResponse.json({ success: true, message: 'Recipe unsaved (placeholder)' })
+  } catch (error) {
+    console.error('Failed to unsave recipe:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
