@@ -1,0 +1,450 @@
+{
+  "user_2example": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_30HWzA9KPhLSFfghlBkFlZ1s2y8": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_123456789": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_1": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_2": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_3": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_01HXYZ123456789": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  },
+  "user_01HXYZ987654321": {
+    "external-1": {
+      "id": "external-1",
+      "title": "Spaghetti Carbonara",
+      "description": "Classic Italian pasta dish with eggs, cheese, and pancetta",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 20,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Italian",
+        "Pasta",
+        "Quick"
+      ],
+      "source": "external",
+      "externalId": "1",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    },
+    "external-2": {
+      "id": "external-2",
+      "title": "Chicken Tikka Masala",
+      "description": "Creamy and flavorful Indian curry with tender chicken",
+      "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&h=300&fit=crop",
+      "cookingTime": 45,
+      "servings": 6,
+      "difficulty": "Medium",
+      "tags": [
+        "Indian",
+        "Curry",
+        "Spicy"
+      ],
+      "source": "external",
+      "externalId": "2",
+      "externalSource": "Spoonacular",
+      "rating": 4.8
+    },
+    "external-716004": {
+      "id": "external-716004",
+      "title": "Pasta with Meat and Vegetables",
+      "description": "A delicious pasta dish with tender meat and fresh vegetables in a creamy sauce",
+      "image": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop",
+      "cookingTime": 35,
+      "servings": 4,
+      "difficulty": "Medium",
+      "tags": [
+        "Pasta",
+        "Meat",
+        "Vegetables"
+      ],
+      "source": "external",
+      "externalId": "716004",
+      "externalSource": "Spoonacular",
+      "rating": 4.5
+    }
+  }
+}
