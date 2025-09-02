@@ -14,7 +14,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.0.0
           run_install: false
 
       - name: Use Node 22
@@ -42,7 +42,7 @@ jobs:
             ${{ runner.os }}-turbo-
 
       - name: Lint / Typecheck / Test / Build
-        run: pnpm ci
+        run: pnpm run ci
 
       - name: Check for build artifacts
         run: |

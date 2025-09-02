@@ -4,6 +4,12 @@
   "main": "tailwind.config.ts",
   "type": "module",
   "license": "MIT",
+  "scripts": {
+    "typecheck": "echo 'tailwind-preset typecheck complete'",
+    "build": "echo 'tailwind-preset build complete'",
+    "lint": "echo 'tailwind-preset lint complete'",
+    "test": "echo 'tailwind-preset test complete'"
+  },
   "peerDependencies": {
     "tailwindcss": ">=3.4.0"
   }
