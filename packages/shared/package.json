@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "main": "index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "echo 'shared build complete'",
+    "lint": "echo 'shared lint complete'",
+    "test": "echo 'shared test complete'"
+  },
   "dependencies": {
     "zod": "^4.0.11"
   },

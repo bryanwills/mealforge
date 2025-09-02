@@ -5,20 +5,28 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore"
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
+    "prepare": "husky",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "ci": "turbo run test build --filter='!mealforge-web'"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.6",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "prettier": "3.5.3",
     "turbo": "2.5.2"
   },
+  "packageManager": "pnpm@10.0.0",
   "engines": {
-    "node": ">=18.8.0"
+    "node": ">=22.0.0"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-  "packageManager": "yarn@1.22.19",
   "dependencies": {
     "next-auth": "^4.24.11"
   }

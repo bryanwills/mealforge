@@ -3,15 +3,17 @@
   "globalDependencies": ["**/.env.*local"],
   "ui": "tui",
   "tasks": {
+    "typecheck": { "outputs": [] },
+    "lint": { "outputs": [] },
+    "test": { "outputs": [] },
     "build": {
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "build/**", "!.next/cache/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "lint": {},
     "clean": {
       "cache": false
     }

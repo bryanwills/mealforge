@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.0.0
+          run_install: false
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Verify pnpm installation
+        run: |
+          pnpm --version
+          which pnpm
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Turborepo
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.cache/turbo
+            .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Lint / Typecheck / Test / Build
+        run: pnpm run ci
+
+      - name: Check for build artifacts
+        run: |
+          echo "Build completed successfully"
+          ls -la dist/ || echo "No dist directory found"

@@ -84,6 +84,7 @@ temp/
 # Logs
 logs
 *.log
+**.log**
 
 # Editor directories and files
 .vscode/*
@@ -98,3 +99,5 @@ logs
 # OS generated files
 Thumbs.db
 ehthumbs.db
+
+.turbo/**

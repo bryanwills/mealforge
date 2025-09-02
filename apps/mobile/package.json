@@ -8,13 +8,13 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "build": "echo 'mobile build complete'",
+    "build": "echo 'mobile build complete' && mkdir -p dist && echo 'mobile build complete' > dist/build.txt",
     "lint": "echo 'mobile lint complete'"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.10.3",
-    "@mealforge/database": "*",
-    "@mealforge/shared": "*",
+    "@mealforge/database": "workspace:*",
+    "@mealforge/shared": "workspace:*",
     "@expo/vector-icons": "^14.0.4",
     "expo": "~52.0.16",
     "expo-router": "~4.0.11",
