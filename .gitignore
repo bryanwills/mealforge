@@ -84,6 +84,7 @@ temp/
 # Logs
 logs
 *.log
+**.log**
 
 # Editor directories and files
 .vscode/*
