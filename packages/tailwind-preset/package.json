@@ -1,0 +1,10 @@
+{
+  "name": "@mealforge/tailwind-preset",
+  "version": "0.1.0",
+  "main": "tailwind.config.ts",
+  "type": "module",
+  "license": "MIT",
+  "peerDependencies": {
+    "tailwindcss": ">=3.4.0"
+  }
+}
