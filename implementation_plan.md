@@ -46,6 +46,7 @@ MealForge is a comprehensive recipe management platform that enables users to:
   - OpenRouter integration
   - Ollama local integration (self-hosted)
   - Multi-stage fallback strategy
+  - Rent H200 GPU instance to train data to VPS.
 
 ### Phase 4: Production-Ready Solutions - COMPLETED
 - **Status**: COMPLETED
