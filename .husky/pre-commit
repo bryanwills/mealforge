@@ -1,1 +1,11 @@
-npm test
+#!/usr/bin/env sh
+
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm test
+elif command -v corepack >/dev/null 2>&1; then
+  corepack enable >/dev/null 2>&1 || true
+  pnpm test 2>/dev/null || corepack pnpm test
+else
+  echo "husky pre-commit: pnpm/corepack not found in PATH"
+  exit 1
+fi
