@@ -129,6 +129,7 @@ MealForge is a comprehensive recipe management platform that enables users to:
 4. **Mobile App Integration**: Update mobile app to use shared authentication
 5. **Documentation**: Complete authentication system documentation
 6. **Plan for scaling**: Come up with a plan to scale once users exceed a set amount
+7. **AI Processing**:Rent H200 GPU instance to train data to VPS.
 
 #### Benefits of Migration:
 - **Better Monorepo Support**: Improved compatibility with Next.js 15 + React 19
