@@ -12,7 +12,7 @@
     "lint": "echo 'mobile lint complete'"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.10.3",
+    "@clerk/clerk-expo": "^2.19.36",
     "@mealforge/database": "workspace:*",
     "@mealforge/shared": "workspace:*",
     "@expo/vector-icons": "^14.0.4",
