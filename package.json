@@ -28,6 +28,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "next-auth": "^4.24.12"
+    "next-auth": "^4.24.15"
   }
 }
